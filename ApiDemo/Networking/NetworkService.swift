@@ -30,6 +30,9 @@ final class NetworkService: NetworkServiceProtocol {
         responseType: T.Type
     ) async throws -> T {
         
+        guard NetworkMonitor.shared.isConnected else {
+            throw NetworkError.noInternetConnection
+        }
         let request = try buildRequest(for: endpoint)
         
         do {
