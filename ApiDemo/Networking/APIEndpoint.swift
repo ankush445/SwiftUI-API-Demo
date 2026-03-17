@@ -1,5 +1,23 @@
 import Foundation
 
+
+public enum Environment {
+    case local
+    case staging
+    case production
+    
+    var baseURL: URL {
+        switch self {
+        case .local:
+            return URL(string: "https://jsonplaceholder.typicode.com")!
+        case .staging:
+            return URL(string: "https://jsonplaceholder.typicode.com")!
+        case .production:
+            return URL(string: "https://jsonplaceholder.typicode.com")!
+        }
+    }
+}
+
 protocol APIEndpointProtocol {
     var baseURL: URL { get }
     var path: String { get }
@@ -17,7 +35,7 @@ enum APIEndpoint: APIEndpointProtocol {
     case deleteUser(id: Int)
     
     var baseURL: URL {
-        URL(string: "https://jsonplaceholder.typicode.com")!
+        Environment.local.baseURL
     }
     
     var path: String {
