@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import SwiftUI_Loader
 struct ContentView: View {
     
     @StateObject var viewModel: UserViewModel
@@ -14,9 +14,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                if viewModel.isLoading {
-                    ProgressView()
-                } else if let errorMessage = viewModel.errorMessage {
+            if let errorMessage = viewModel.errorMessage {
                     VStack(spacing: 16) {
                         Image(systemName: "exclamationmark.circle")
                             .font(.system(size: 48))
@@ -69,6 +67,7 @@ struct ContentView: View {
             .task {
                 await viewModel.fetchUsers()
             }
+            .loadingIndicator(isLoading: viewModel.isLoading, message: "")
         }
     }
 }

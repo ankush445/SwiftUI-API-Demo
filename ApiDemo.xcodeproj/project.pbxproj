@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F7393ADB2F696C57007E3355 /* SwiftUI_Loader in Frameworks */ = {isa = PBXBuildFile; productRef = F7393ADA2F696C57007E3355 /* SwiftUI_Loader */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		F79E47AF2F61742E00BE04B2 /* ApiDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ApiDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F7393ADB2F696C57007E3355 /* SwiftUI_Loader in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = ApiDemo;
 			packageProductDependencies = (
+				F7393ADA2F696C57007E3355 /* SwiftUI_Loader */,
 			);
 			productName = ApiDemo;
 			productReference = F79E47AF2F61742E00BE04B2 /* ApiDemo.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = F79E47A62F61742E00BE04B2;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F7393AD92F696C57007E3355 /* XCRemoteSwiftPackageReference "SwiftUI_Loader" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F79E47B02F61742E00BE04B2 /* Products */;
 			projectDirPath = "";
@@ -328,6 +337,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F7393AD92F696C57007E3355 /* XCRemoteSwiftPackageReference "SwiftUI_Loader" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ankush445/SwiftUI_Loader.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F7393ADA2F696C57007E3355 /* SwiftUI_Loader */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F7393AD92F696C57007E3355 /* XCRemoteSwiftPackageReference "SwiftUI_Loader" */;
+			productName = SwiftUI_Loader;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F79E47A72F61742E00BE04B2 /* Project object */;
 }

@@ -1,0 +1,15 @@
+{
+  "originHash" : "f8d4565449b531eee81556dbe47546b21df2b95a7045b20a6713e7172f5c4dc9",
+  "pins" : [
+    {
+      "identity" : "swiftui_loader",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ankush445/SwiftUI_Loader.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "09f13a56bfd7316ae652ad4469d6023f2c4dbbda"
+      }
+    }
+  ],
+  "version" : 3
+}
