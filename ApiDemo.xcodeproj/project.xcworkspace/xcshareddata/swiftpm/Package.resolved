@@ -1,6 +1,15 @@
 {
-  "originHash" : "f8d4565449b531eee81556dbe47546b21df2b95a7045b20a6713e7172f5c4dc9",
+  "originHash" : "97c6a6e2e70fb7df8f8826982344b036038acf8b50d1a5bd395909f7ee14ea9e",
   "pins" : [
+    {
+      "identity" : "fancytoastkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ankush445/FancyToastKit.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "1d92104cce777e8253146998a9730561fb2ea026"
+      }
+    },
     {
       "identity" : "swiftui_loader",
       "kind" : "remoteSourceControl",

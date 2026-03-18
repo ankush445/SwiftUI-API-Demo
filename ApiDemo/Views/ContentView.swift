@@ -7,32 +7,15 @@
 
 import SwiftUI
 import SwiftUI_Loader
+import FancyToastKit
 struct ContentView: View {
     
     @StateObject var viewModel: UserViewModel
-
+    
     var body: some View {
         NavigationStack {
             ZStack {
-            if let errorMessage = viewModel.errorMessage {
-                    VStack(spacing: 16) {
-                        Image(systemName: "exclamationmark.circle")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.red)
-                        Text("Error")
-                            .font(.headline)
-                        Text(errorMessage)
-                            .font(.body)
-                            .multilineTextAlignment(.center)
-                        Button("Retry") {
-                            Task {
-                                await viewModel.fetchUsers()
-                            }
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                    .padding()
-                } else if viewModel.users.isEmpty {
+                if viewModel.users.isEmpty {
                     VStack(spacing: 16) {
                         Image(systemName: "person.slash")
                             .font(.system(size: 48))
@@ -68,6 +51,7 @@ struct ContentView: View {
                 await viewModel.fetchUsers()
             }
             .loadingIndicator(isLoading: viewModel.isLoading, message: "")
+            .toastView(toast: $viewModel.toast)
         }
     }
 }
