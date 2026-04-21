@@ -7,6 +7,7 @@ enum NetworkError: LocalizedError {
     case serverError(statusCode: Int, message: String?)
     case tokenExpired
     case tokenRefreshFailed
+    case noRefreshToken
     case noInternetConnection
     case requestTimeout
     case unknown(Error)
@@ -25,6 +26,8 @@ enum NetworkError: LocalizedError {
             return "Your session has expired. Please log in again."
         case .tokenRefreshFailed:
             return "Failed to refresh authentication token."
+        case .noRefreshToken:
+            return "Access Token Empty"
         case .noInternetConnection:
             return "No internet connection available."
         case .requestTimeout:

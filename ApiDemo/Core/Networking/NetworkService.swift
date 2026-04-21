@@ -31,28 +31,60 @@ final class NetworkService: NetworkServiceProtocol {
     ) async throws -> T {
         
         guard NetworkMonitor.shared.isConnected else {
+            Logger.log("No Internet Connection", level: .error)
             throw NetworkError.noInternetConnection
         }
+        
         let request = try buildRequest(for: endpoint)
+        
+        // ⏱️ Start time
+        let startTime = Date()
+        
+        // 🔥 Request Log
+        Logger.log("\(request.httpMethod ?? "") \(request.url?.absoluteString ?? "")", level: .request)
+        
+        if let headers = request.allHTTPHeaderFields {
+            Logger.log("Headers: \(headers)", level: .info)
+        }
+        
+        if let body = request.httpBody {
+            Logger.prettyJSON(body)
+        }
         
         do {
             let (data, response) = try await session.data(for: request)
+            
+            let duration = Date().timeIntervalSince(startTime)
+            
+            // 🔥 Response Log
+            if let httpResponse = response as? HTTPURLResponse {
+                Logger.log("Status: \(httpResponse.statusCode) (\(String(format: "%.2f", duration))s)", level: .success)
+            }
+            
+            Logger.prettyJSON(data)
+            
             return try handleResponse(data, response: response, responseType: responseType)
             
         } catch NetworkError.tokenExpired {
             
-            // Refresh Token
+            Logger.log("🔄 Token expired. Refreshing...", level: .info)
+            
             _ = try await authService.refreshToken()
             
-            // Retry request
             let retryRequest = try buildRequest(for: endpoint)
             let (data, response) = try await session.data(for: retryRequest)
+            
+            Logger.log("🔁 Retried Request Success", level: .success)
+            Logger.prettyJSON(data)
             
             return try handleResponse(data, response: response, responseType: responseType)
             
         } catch let error as URLError {
+            Logger.log("URLError: \(error.localizedDescription)", level: .error)
             throw mapURLError(error)
+            
         } catch {
+            Logger.log("Unknown Error: \(error.localizedDescription)", level: .error)
             throw NetworkError.unknown(error)
         }
     }
@@ -62,11 +94,15 @@ final class NetworkService: NetworkServiceProtocol {
 private extension NetworkService {
     
     func buildRequest(for endpoint: APIEndpointProtocol) throws -> URLRequest {
+                
+        var components = URLComponents(
+            url: endpoint.baseURL.appendingPathComponent(endpoint.path),
+            resolvingAgainstBaseURL: true
+        )
         
-        let url = endpoint.baseURL.appendingPathComponent(endpoint.path)
+        components?.queryItems = endpoint.queryItems
         
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-              let finalURL = components.url else {
+        guard let finalURL = components?.url else {
             throw NetworkError.invalidURL
         }
         
@@ -98,25 +134,30 @@ private extension NetworkService {
     ) throws -> T {
         
         guard let httpResponse = response as? HTTPURLResponse else {
+            Logger.log("Invalid Response", level: .error)
             throw NetworkError.invalidResponse
         }
         
         switch httpResponse.statusCode {
             
         case 200...299:
+            Logger.log("✅ Success Response", level: .success)
             return try decode(data, type: responseType)
             
         case 401:
+            Logger.log("❌ 401 Unauthorized", level: .error)
             throw NetworkError.tokenExpired
             
         case 400...499, 500...599:
             let message = try? extractErrorMessage(from: data)
+            Logger.log("❌ Server Error: \(message ?? "Unknown")", level: .error)
             throw NetworkError.serverError(
                 statusCode: httpResponse.statusCode,
                 message: message
             )
             
         default:
+            Logger.log("❌ Unexpected Status Code: \(httpResponse.statusCode)", level: .error)
             throw NetworkError.invalidResponse
         }
     }
