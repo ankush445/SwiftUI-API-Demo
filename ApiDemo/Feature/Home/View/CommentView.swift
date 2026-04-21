@@ -33,16 +33,34 @@ struct CommentView: View {
             ScrollView {
                 LazyVStack(spacing: 16) {
                     
-                    if vm.comments.isEmpty {
+                    if vm.comments.isEmpty && !vm.isCommentLoading {
                         Text("No comments yet")
                             .foregroundColor(.gray)
                             .padding(.top, 50)
                     }
                     
                     else {
-                        ForEach(vm.comments) { comment in
-                            CommentRowView(comment: comment)
+                        ForEach(vm.rootComments) { comment in
+                            CommentRowView(
+                                comment: comment,
+                                replies: vm.replies(for: comment),
+                                vm: vm,
+                                postId: post.id
+                            )
+                            .onAppear {
+                                   // 🔥 pagination trigger
+                                   if comment.id == vm.rootComments.last?.id {
+                                       Task {
+                                           await vm.fetchMoreComments(postId: post.id)
+                                       }
+                                   }
+                               }
                         }
+                        if vm.isCommentLoading && !vm.comments.isEmpty {
+                            ProgressView()
+                                .padding()
+                        }
+
                     }
                 }
                 .padding(.top, 10)
@@ -93,63 +111,155 @@ struct CommentView: View {
 struct CommentRowView: View {
     
     let comment: Comment
-    @State private var isLiked = false
-    @State private var likeCount = 0
+    let replies: [Comment]
+    @Bindable var vm: HomeViewModel
+    let postId: String
     
+    @State private var showReplyField = false
+    @State private var replyText = ""
+    @State private var isLiked = false
+    @State private var isExpanded = false
+
     var body: some View {
-        HStack(alignment: .top, spacing: 10) {
+        VStack(alignment: .leading, spacing: 10) {
             
-            // 👤 Avatar
-            ZStack {
-                Circle()
-                    .fill(dynamicColor(for: comment.user.name))
-                    .frame(width: 36, height: 36)
+            // 🔹 Main Comment
+            HStack(alignment: .top, spacing: 10) {
                 
-                Text(comment.user.name.prefix(1))
-                    .foregroundColor(.white)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-            }
-            
-            VStack(alignment: .leading, spacing: 6) {
+                avatar
                 
-                // 👤 Name + Comment
-                HStack{
-                    Text("\(comment.user.name) ")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                    Text(comment.createdAt, style: .time)
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                HStack {
+                VStack(alignment: .leading, spacing: 6) {
+                    
+                    header
+                    
                     Text(comment.text)
                         .font(.subheadline)
-                    Spacer()
-                    Button {
-                        isLiked.toggle()
-                        likeCount += isLiked ? 1 : -1
-                        HapticManager.trigger(.light)
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: isLiked ? "heart.fill" : "heart")
-                            Text("\(likeCount)")
-                        }
-                    }
-                    .font(.caption)
-                    .foregroundColor(isLiked ? .red : .gray)
+                    
+                    actions
                 }
                 
-                Button("Reply") {
-                    // 🔥 future: open reply input
+                Spacer()
+            }
+            
+            // 🔁 Replies
+            if !replies.isEmpty {
+                
+                Button(isExpanded ? "Hide replies" : "View replies (\(replies.count))") {
+                    isExpanded.toggle()
                 }
                 .font(.caption)
                 .foregroundColor(.gray)
+                .padding(.leading, 46)
+                
+                if isExpanded {
+                    VStack(alignment: .leading, spacing: 12) {
+                        ForEach(replies) { reply in
+                            HStack(alignment: .top, spacing: 10) {
+                                
+                                avatarSmall(reply.user.name)
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(reply.user.name)
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                    
+                                    Text(reply.text)
+                                        .font(.caption)
+                                    
+                                    Text(reply.createdAt, style: .time)
+                                        .font(.caption2)
+                                        .foregroundColor(.gray)
+                                }
+                            }
+                        }
+                    }
+                    .padding(.leading, 46)
+                }
             }
             
-            Spacer()
+            // ✍️ Reply Input
+            if showReplyField {
+                HStack {
+                    TextField("Reply...", text: $replyText)
+                        .textFieldStyle(.roundedBorder)
+                    
+                    Button("Send") {
+                        vm.addReply(
+                            postId: postId,
+                            parentId: comment.id,
+                            text: replyText
+                        )
+                        replyText = ""
+                        showReplyField = false
+                    }
+                }
+                .padding(.leading, 46)
+            }
         }
         .padding(.horizontal)
+    }
+    
+    var avatar: some View {
+        ZStack {
+            Circle()
+                .fill(dynamicColor(for: comment.user.name))
+                .frame(width: 36, height: 36)
+            
+            Text(comment.user.name.prefix(1))
+                .foregroundColor(.white)
+        }
+    }
+    
+    
+    func avatarSmall(_ name: String) -> some View {
+        ZStack {
+            Circle()
+                .fill(dynamicColor(for: name))
+                .frame(width: 28, height: 28)
+            
+            Text(name.prefix(1))
+                .font(.caption)
+                .foregroundColor(.white)
+        }
+    }
+    
+    var header: some View {
+        HStack {
+            Text(comment.user.name)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+            
+            Text(comment.createdAt, style: .time)
+                .font(.caption)
+                .foregroundColor(.gray)
+        }
+    }
+    
+    var actions: some View {
+        HStack(spacing: 16) {
+            
+            Button {
+                isLiked.toggle()
+                HapticManager.trigger(.light)
+                
+                // 🔥 Call API here
+//                vm.likeComment(commentId: comment.id)
+                
+            } label: {
+                Image(systemName: isLiked ? "heart.fill" : "heart")
+                    .foregroundColor(isLiked ? .red : .gray)
+            }
+            
+            Text("\(comment.likesCount)")
+                .font(.caption)
+                .foregroundColor(.gray)
+            
+            Button("Reply") {
+                showReplyField.toggle()
+            }
+            .font(.caption)
+            .foregroundColor(.gray)
+        }
     }
 }
 

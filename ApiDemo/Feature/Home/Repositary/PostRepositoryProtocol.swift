@@ -13,8 +13,13 @@ protocol PostRepositoryProtocol {
     func likePost(id: String) async throws -> PostLikeModel
     func addComment(postId: String, text: String) async throws -> CommentResponse
 
-    func getComments(postId: String) async throws -> CommentListResponse
-
+    func getComments(postId: String, cursor: String?) async throws -> CommentListResponse
+    func addReply(
+        postId: String,
+        parentId: String,
+        text: String
+    ) async throws -> CommentResponse
+//    func likeComment(commentId: String) async throws -> MessageResponse
 }
 
 final class PostRepository: PostRepositoryProtocol {
@@ -44,9 +49,28 @@ final class PostRepository: PostRepositoryProtocol {
     func addComment(postId: String, text: String) async throws -> CommentResponse {
         return try await networkService.request(APIEndpoint.addComment(postId: postId, text: text), responseType: CommentResponse.self)
     }
-    
-    func getComments(postId: String) async throws -> CommentListResponse {
-        return try await networkService.request(APIEndpoint.getComment(postId: postId), responseType: CommentListResponse.self)
+    func addReply(postId: String,parentId: String, text: String
+    ) async throws -> CommentResponse {
+        
+        return try await networkService.request(
+            APIEndpoint.addReply(
+                postId: postId,
+                parentId: parentId,
+                text: text
+            ),
+            responseType: CommentResponse.self
+        )
     }
+    
+    func getComments(postId: String, cursor: String?) async throws -> CommentListResponse {
+        return try await networkService.request(APIEndpoint.getComment(postId: postId, cursor: cursor), responseType: CommentListResponse.self)
+    }
+    
+//    func likeComment(commentId: String) async throws -> MessageResponse {
+//        try await networkService.request(
+//            APIEndpoint.likeComment(id: commentId),
+//            responseType: MessageResponse.self
+//        )
+//    }
     
 }

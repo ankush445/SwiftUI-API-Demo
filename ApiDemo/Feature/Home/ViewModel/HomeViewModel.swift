@@ -27,6 +27,10 @@ final class HomeViewModel: ToastPresentable {
     var comments: [Comment] = []
     var isCommentLoading = false
 
+    private var commentCursor: String?
+    private var hasMoreComments = true
+    private var isFetchingMore = false
+
     init(repository: PostRepositoryProtocol) {
         self.repository = repository
     }
@@ -154,22 +158,55 @@ final class HomeViewModel: ToastPresentable {
 
 
     // MARK: - Get Comments
-    func fetchComments(postId: String) async {
-        comments = [] // ✅ reset first
-        
-        isCommentLoading = true
-        defer { isCommentLoading = false }
-        
-        do {
-            let response = try await repository.getComments(postId: postId)
-            await MainActor.run {
-                comments = response.data
-            }
-        } catch {
-            showError(error)
-        }
+    
+    var rootComments: [Comment] {
+        comments.filter { $0.parentCommentId == nil }
     }
 
+    func replies(for comment: Comment) -> [Comment] {
+        comments.filter { $0.parentCommentId == comment.id }
+    }
+    func fetchComments(postId: String) async {
+        resetComments()
+        await fetchMoreComments(postId: postId)
+    }
+    
+    func fetchMoreComments(postId: String) async {
+        
+        guard !isFetchingMore, hasMoreComments else { return }
+        
+        isFetchingMore = true
+        isCommentLoading = true
+        
+        defer {
+            isFetchingMore = false
+            isCommentLoading = false
+        }
+        
+        do {
+            let response = try await repository.getComments(
+                postId: postId,
+                cursor: commentCursor
+            )
+            
+            await MainActor.run {
+                comments.append(contentsOf: response.data)
+                commentCursor = response.nextCursor
+                hasMoreComments = response.hasMore
+            }
+            
+        } catch {
+            await MainActor.run {
+                showError(error)
+            }
+        }
+    }
+    
+    private func resetComments() {
+        comments = []
+        commentCursor = nil
+        hasMoreComments = true
+    }
     // MARK: - Add Comment
     func addComment(postId: String, text: String) {
         guard !text.trimmingCharacters(in: .whitespaces).isEmpty else { return }
@@ -188,6 +225,27 @@ final class HomeViewModel: ToastPresentable {
                     }
                     
                     HapticManager.trigger(.light)
+                }
+                
+            } catch {
+                await MainActor.run {
+                    showError(error)
+                }
+            }
+        }
+    }
+    
+    func addReply(postId: String, parentId: String, text: String) {
+        Task {
+            do {
+                let response = try await repository.addReply(
+                    postId: postId,
+                    parentId: parentId,
+                    text: text
+                )
+                
+                await MainActor.run {
+                    comments.insert(response.data, at: 0)
                 }
                 
             } catch {

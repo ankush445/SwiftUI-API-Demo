@@ -9,6 +9,8 @@ import Foundation
 struct CommentListResponse: Codable {
     let success: Bool
     let data: [Comment]
+    let nextCursor: String?
+    let hasMore: Bool
 }
 
 struct Comment: Identifiable, Codable {
@@ -19,6 +21,8 @@ struct Comment: Identifiable, Codable {
     let postId: String
     let createdAt: Date
     let updatedAt: Date
+    let parentCommentId: String?
+    let likesCount: Int
     
     enum CodingKeys: String, CodingKey {
         case id = "_id"
@@ -27,6 +31,8 @@ struct Comment: Identifiable, Codable {
         case postId
         case createdAt
         case updatedAt
+        case parentCommentId
+        case likesCount
     }
 }
 

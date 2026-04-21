@@ -41,7 +41,8 @@ enum APIEndpoint: APIEndpointProtocol {
     case createPost(title: String, content: String?)
     case postLike(id: String)
     case addComment(postId: String, text: String)
-    case getComment(postId: String)
+    case addReply(postId: String, parentId: String, text: String)
+    case getComment(postId: String, cursor: String?)
 
 
     
@@ -73,7 +74,9 @@ enum APIEndpoint: APIEndpointProtocol {
             return "/likes/\(id)"
         case .addComment:
             return "/comments/add-comment"
-        case .getComment(let postId):
+        case .addReply:
+            return "/comments/add-comment"
+        case .getComment(let postId, _):
             return "/comments/\(postId)"
         }
     }
@@ -82,7 +85,7 @@ enum APIEndpoint: APIEndpointProtocol {
         switch self {
         case .getFeed,.getComment:
             return .get
-        case .signUp ,.login,.getRefreshToken, .logout, .createPost,.postLike, .addComment:
+        case .signUp ,.login,.getRefreshToken, .logout, .createPost,.postLike, .addComment, .addReply:
             return .post
         case .delete:
             return .delete
@@ -108,6 +111,11 @@ enum APIEndpoint: APIEndpointProtocol {
             return ["title":title, "content": content ?? ""]
         case .addComment(let postId, let text):
             return ["postId": postId, "text": text]
+        case .addReply(let postId,let parentId, let text):
+            return ["postId": postId,
+                    "text": text,
+                    "parentCommentId": parentId
+            ]
         default:
             return nil
         }
@@ -125,6 +133,13 @@ enum APIEndpoint: APIEndpointProtocol {
             items.append(URLQueryItem(name: "limit", value: "\(limit)"))
 
             
+            return items
+            
+        case .getComment(_, let cursor):
+            var items: [URLQueryItem] = []
+            if let cursor = cursor {
+                items.append(URLQueryItem(name: "cursor", value: cursor))
+            }
             return items
         default:
             return nil
