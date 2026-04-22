@@ -139,7 +139,6 @@ struct CommentView: View {
             .background(Color.white)
         }
         .background(Color(.systemGroupedBackground))
-        .loadingIndicator(isLoading: vm.isLoading)
         .onAppear {
             Task {
                 await vm.fetchComments(postId: post.id)
@@ -232,7 +231,7 @@ struct CommentRowView: View {
     func commentView(comment: Comment)-> some View {
         HStack(alignment: .top, spacing: 10) {
             
-            avatar
+            avatarSmall(comment.user.name)
             
             VStack(alignment: .leading, spacing: 4) {
                 
@@ -291,16 +290,6 @@ struct CommentRowView: View {
                         .foregroundColor(.gray)
                 }
             }
-        }
-    }
-    
-    var avatar: some View {
-        ZStack {
-            Circle()
-                .fill(dynamicColor(for: comment.user.name))
-                .frame(width: 36, height: 36)
-            Text(comment.user.name.prefix(1))
-                .foregroundColor(.white)
         }
     }
 

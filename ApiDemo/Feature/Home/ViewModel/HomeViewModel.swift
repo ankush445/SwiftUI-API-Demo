@@ -19,7 +19,7 @@ final class HomeViewModel: ToastPresentable {
     
     private let repository: PostRepositoryProtocol
     
-    private var nextCursor: String?
+    var nextCursor: String?
     private var hasMore = true
     private var searchTask: Task<Void, Never>?
     private var likingIds: Set<String> = []

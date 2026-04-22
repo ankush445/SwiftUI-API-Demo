@@ -71,6 +71,9 @@ struct HomeView: View {
                                 }
                             }
                         }
+                        if vm.nextCursor != nil && vm.isLoading {
+                            ProgressView()
+                        }
                     }
                     .padding(.horizontal)
                     .padding(.top, 0)
@@ -108,7 +111,7 @@ struct HomeView: View {
                     }
                 }
             }
-            .loadingIndicator(isLoading: vm.isLoading)
+            .loadingIndicator(isLoading: (vm.isLoading && vm.nextCursor == nil))
             .navigationTitle("Feed")
             .toolbar {
                 

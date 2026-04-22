@@ -14,25 +14,24 @@ func dynamicColor(for name: String) -> Color {
 func timeAgo(_ dateString: String) -> String {
     
     let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [
-        .withInternetDateTime,
-        .withFractionalSeconds // 🔥 IMPORTANT FIX
-    ]
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
     
-    guard let date = formatter.date(from: dateString) else {
-        return ""
+    var date = formatter.date(from: dateString)
+    
+    // 🔁 fallback if milliseconds not present
+    if date == nil {
+        formatter.formatOptions = [.withInternetDateTime]
+        date = formatter.date(from: dateString)
     }
     
-    let seconds = Int(Date().timeIntervalSince(date))
+    guard let finalDate = date else { return "" }
+    
+    let seconds = Int(Date().timeIntervalSince(finalDate))
     
     switch seconds {
-    case 0..<60:
-        return "\(seconds)s"
-    case 60..<3600:
-        return "\(seconds / 60)m"
-    case 3600..<86400:
-        return "\(seconds / 3600)h"
-    default:
-        return "\(seconds / 86400)d"
+    case 0..<60: return "\(seconds)s"
+    case 60..<3600: return "\(seconds / 60)m"
+    case 3600..<86400: return "\(seconds / 3600)h"
+    default: return "\(seconds / 86400)d"
     }
 }

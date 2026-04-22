@@ -22,7 +22,7 @@ final class AuthService: AuthServiceProtocol {
     
     func refreshToken() async throws -> String {
         
-        guard let url = URL(string: "http://localhost:3000/api/users/refresh-token") else {
+        guard let url = URL(string: "http://192.168.1.148:3000/api/users/refresh-token") else {
             Logger.log("Invalid refresh token URL", level: .error)
             throw NetworkError.invalidURL
         }
