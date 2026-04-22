@@ -28,7 +28,7 @@ struct PostCardView: View {
                 
                 Spacer()
                 
-                Text(post.createdAt, style: .time)
+                Text(timeAgo(post.createdAt))
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -47,6 +47,7 @@ struct PostCardView: View {
             HStack {
                 Button(action: onLike) {
                     Image(systemName: post.isLiked ? "heart.fill" : "heart")
+                        .foregroundColor(post.isLiked ? .red : .gray)
                     Text("\(post.likeCount)")
                 }
                 .buttonStyle(.plain)

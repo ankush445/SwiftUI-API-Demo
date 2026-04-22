@@ -22,7 +22,7 @@ struct AuthResponse: Codable {
 struct User: Codable, Identifiable {
     let id: String
     let name: String
-    let email: String
+    let email: String?
     let createdAt: String?
     let updatedAt: String?
 

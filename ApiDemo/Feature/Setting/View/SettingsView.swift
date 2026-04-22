@@ -42,7 +42,7 @@ struct SettingsView: View {
                         Text(user.name)
                             .font(.headline)
                         
-                        Text(user.email)
+                        Text(user.email ?? "xyz@gmail.com")
                             .font(.caption)
                             .foregroundColor(.gray)
                     }
@@ -99,13 +99,3 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - Helper
-
-private extension SettingsView {
-    
-    func dynamicColor(for name: String) -> Color {
-        let hash = abs(name.hashValue)
-        let hue = Double(hash % 256) / 255.0
-        return Color(hue: hue, saturation: 0.6, brightness: 0.8)
-    }
-}

@@ -43,6 +43,10 @@ enum APIEndpoint: APIEndpointProtocol {
     case addComment(postId: String, text: String)
     case addReply(postId: String, parentId: String, text: String)
     case getComment(postId: String, cursor: String?)
+    case getRepliesComment(commentId: String, cursor: String?)
+    case commentLike(commentId: String)
+
+
 
 
     
@@ -78,14 +82,18 @@ enum APIEndpoint: APIEndpointProtocol {
             return "/comments/add-comment"
         case .getComment(let postId, _):
             return "/comments/\(postId)"
+        case .getRepliesComment(let commentId, _):
+            return "/comments/\(commentId)/replies"
+        case .commentLike(let commentId):
+            return "/comments/\(commentId)/like"
         }
     }
     
     var method: HTTPMethod {
         switch self {
-        case .getFeed,.getComment:
+        case .getFeed,.getComment, .getRepliesComment:
             return .get
-        case .signUp ,.login,.getRefreshToken, .logout, .createPost,.postLike, .addComment, .addReply:
+        case .signUp ,.login,.getRefreshToken, .logout, .createPost,.postLike, .addComment, .addReply, .commentLike:
             return .post
         case .delete:
             return .delete
@@ -136,6 +144,12 @@ enum APIEndpoint: APIEndpointProtocol {
             return items
             
         case .getComment(_, let cursor):
+            var items: [URLQueryItem] = []
+            if let cursor = cursor {
+                items.append(URLQueryItem(name: "cursor", value: cursor))
+            }
+            return items
+        case .getRepliesComment(_, let cursor):
             var items: [URLQueryItem] = []
             if let cursor = cursor {
                 items.append(URLQueryItem(name: "cursor", value: cursor))

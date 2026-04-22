@@ -155,7 +155,7 @@ struct HomeView: View {
                 }
             }
             .sheet(item: $selectedPost) { post in
-                CommentView(post: post, vm: vm, session: session)
+                CommentView(post: post, viewModel: CommentViewModel(repository: AppDI.shared.postRepository), session: session)
                     .presentationDetents([.medium, .large]) // ✅ medium + expandable
                     .presentationDragIndicator(.visible)    // ✅ top indicator
                     .presentationCornerRadius(20)           // ✅ modern rounded sheet
@@ -165,19 +165,16 @@ struct HomeView: View {
                 SettingsView(viewModel: SettingViewModel(repository: AppDI.shared.settingRepository, session: session), session: session)
             }
             .toastView(toast: $vm.toast)
+            .onReceive(NotificationCenter.default.publisher(for: .commentUpdated)) { notification in
+                
+                guard let postId = notification.userInfo?["postId"] as? String else { return }
+                
+                if let index = vm.posts.firstIndex(where: { $0.id == postId }) {
+                    vm.posts[index].commentCount += 1
+                }
+            }
 
         }
-    }
-}
-
-// MARK: - Helper
-
-private extension HomeView {
-    
-    func dynamicColor(for name: String) -> Color {
-        let hash = abs(name.hashValue)
-        let hue = Double(hash % 256) / 255.0
-        return Color(hue: hue, saturation: 0.6, brightness: 0.8)
     }
 }
 

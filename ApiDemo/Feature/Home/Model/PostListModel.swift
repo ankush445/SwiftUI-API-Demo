@@ -8,7 +8,7 @@
 import Foundation
 
 
-struct PostLikeModel: Codable {
+struct LikeModel: Codable {
     let success: Bool
     let liked: Bool
 }
@@ -32,8 +32,8 @@ struct Post: Identifiable, Codable {
     let id: String
     let title: String
     let content: String?
-    let createdAt: Date
-    let user: PostUser
+    let createdAt: String
+    let user: User
     var likeCount: Int
     var commentCount: Int
     var isLiked: Bool
@@ -47,17 +47,5 @@ struct Post: Identifiable, Codable {
         case likeCount
         case commentCount
         case isLiked
-    }
-}
-
-struct PostUser: Codable {
-    let id: String
-    let name: String
-    let email: String
-    
-    enum CodingKeys: String, CodingKey {
-        case id = "_id"
-        case name
-        case email
     }
 }
