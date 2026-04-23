@@ -136,9 +136,6 @@ final class CommentViewModel {
     func addReply(postId: String, parentId: String, text: String) async {
         guard let index = comments.firstIndex(where: { $0.id == parentId }) else { return }
         
-        // 🔹 Store old state (for rollback)
-        let oldReplyCount = comments[index].replyCount
-        let oldReplies = repliesMap[parentId] ?? []
         do {
             let response = try await repository.addReply(
                 postId: postId,

@@ -38,9 +38,39 @@ struct HomeView: View {
                 ScrollView(showsIndicators: false) {
                     LazyVStack(spacing: 16) {
                         
-                        // ✅ Empty State
-                        if vm.posts.isEmpty && !vm.isLoading {
-                            Spacer()
+                        // 🔥 SHIMMER (FIRST LOAD)
+                        if vm.isInitialLoading {
+                            ForEach(0..<5, id: \.self) { _ in
+                                PostCardShimmer()
+                            }
+                        }
+                        
+                        // ✅ REAL DATA
+                        else if !vm.posts.isEmpty {
+                            ForEach(vm.posts) { post in
+                                PostCardView(
+                                    post: post,
+                                    onLike: {
+                                        vm.toggleLike(post: post)
+                                    },
+                                    onComment: {
+                                        selectedPost = post
+                                    }
+                                )
+                                .onAppear {
+                                    if post.id == vm.posts.last?.id {
+                                        Task { await vm.fetchPosts() }
+                                    }
+                                }
+                            }
+                            
+                            if vm.nextCursor != nil && vm.isLoading {
+                                ProgressView()
+                            }
+                        }
+                        
+                        // ❌ EMPTY STATE
+                        else {
                             VStack(spacing: 10) {
                                 Image(systemName: "tray")
                                     .font(.largeTitle)
@@ -50,29 +80,6 @@ struct HomeView: View {
                                     .foregroundColor(.gray)
                             }
                             .padding(.top, 100)
-                            Spacer()
-                        }
-                        
-                        // ✅ Posts
-                        ForEach(vm.posts) { post in
-                            PostCardView(
-                                post: post,
-                                onLike: {
-                                    vm.toggleLike(post: post)
-                                },
-                                onComment: {
-                                    selectedPost = post
-                                }
-                            )
-                            .onAppear {
-                                // 🔄 Pagination trigger
-                                if post.id == vm.posts.last?.id {
-                                    Task { await vm.fetchPosts() }
-                                }
-                            }
-                        }
-                        if vm.nextCursor != nil && vm.isLoading {
-                            ProgressView()
                         }
                     }
                     .padding(.horizontal)

@@ -1,156 +1,230 @@
 import SwiftUI
 import FancyToastKit
+import SwiftUI_Loader
 
 struct AuthView: View {
     
     @State private var vm: AuthViewModel
-    @State private var isLogin = true
-    @FocusState private var focusedField: Field?
     
-    enum Field {
-        case name, email, password
-    }
-
+    @Environment(NavigationManager.self) private var nav
+    
     init(viewModel: AuthViewModel) {
         _vm = State(wrappedValue: viewModel)
     }
 
     var body: some View {
-        ZStack {
-            // 🌈 Background Gradient (modern feel)
-            LinearGradient(
-                colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.6)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-            
-            ScrollView {
-                VStack(spacing: 24) {
-                    
-                    Spacer(minLength: 40)
-                    
-                    // 🧠 Title
-                    Text(isLogin ? "Welcome Back 👋" : "Create Account 🚀")
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(.white)
-                    
-                    // 📦 Card Container
-                    VStack(spacing: 16) {
+            ZStack {
+                
+                // Background
+                Color(.appBackground)
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 24) {
                         
-                        if !isLogin {
-                            customTextField(
-                                title: "Name",
-                                text: $vm.name,
-                                field: .name
-                            )
+                        Spacer(minLength: 40)
+                        
+                        // MARK: - Logo
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(
+                                    Color.buttonBackground
+                                )
+                                .frame(width: 70, height: 70)
+                            
+                            Image(systemName: "camera.fill")
+                                .foregroundColor(.white)
+                                .font(.system(size: 28))
                         }
                         
-                        customTextField(
-                            title: "Email",
-                            text: $vm.email,
-                            field: .email,
-                            keyboard: .emailAddress
-                        )
+                        // MARK: - Title
+                        Text(AppStrings.appName)
+                            .customFont(.bold, 28)
                         
-                        customSecureField(
-                            title: "Password",
-                            text: $vm.password,
-                            field: .password
-                        )
+                        Text(vm.isLoginMode
+                             ? AppStrings.loginSubtitle
+                             : AppStrings.signupSubtitle)
+                        .customFont(.medium, 15)
+                        .foregroundColor(Color.textFieldIconBackground)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
                         
-                        // 🚀 Action Button
-                        Button {
-                            hideKeyboard()
-                            Task {
-                                if isLogin {
-                                    await vm.loginUser(
-                                        email: vm.email,
-                                        password: vm.password
-                                    )
-                                } else {
-                                    await vm.createUser(
-                                        name: vm.name,
-                                        email: vm.email,
-                                        password: vm.password
+                        // MARK: - Card
+                        VStack(spacing: 18) {
+                            
+                            if !vm.isLoginMode {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(AppStrings.fullName)
+                                        .customFont(.semiBold, 14)
+                                        .foregroundColor(Color.textFieldIconBackground)
+                                    inputField(
+                                        icon: "person",
+                                        placeholder: AppStrings.fullName,
+                                        text: $vm.name
                                     )
                                 }
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(AppStrings.username)
+                                        .customFont(.semiBold, 14)
+                                        .foregroundColor(Color.textFieldIconBackground)
+                                    inputField(
+                                        icon: "at",
+                                        placeholder: AppStrings.username,
+                                        text: $vm.username
+                                    )
+                                    .onChange(of: vm.username) { _,_  in
+                                        vm.checkUsernameAvailabilityDebounced()
+                                    }
+                                    usernameStatusView
+                                    
+                                }
+                                
                             }
-                        } label: {
-                            if vm.isLoading {
-                                ProgressView()
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                            } else {
-                                Text(isLogin ? "Login" : "Sign Up")
-                                    .fontWeight(.semibold)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(AppStrings.email)
+                                    .customFont(.semiBold, 14)
+                                    .foregroundColor(Color.textFieldIconBackground)
+                                inputField(
+                                    icon: "envelope",
+                                    placeholder: AppStrings.email,
+                                    text: $vm.email
+                                )
                             }
+                            
+                            // Password Section
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(AppStrings.password)
+                                    .customFont(.semiBold, 14)
+                                    .foregroundColor(Color.textFieldIconBackground)
+                                SecureInputField(
+                                    icon: "lock",
+                                    placeholder: AppStrings.password,
+                                    text: $vm.password
+                                )
+                                
+                                HStack {
+                                    Spacer()
+                                    
+                                    if vm.isLoginMode {
+                                        Button {
+                                            nav.showForgotPassword()
+                                        } label: {
+                                            Text(AppStrings.forgotPassword)
+                                                .customFont(.semiBold, 14)
+                                                .foregroundColor(Color(hex: "#433FE5"))
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // MARK: - Button
+                            CustomButton(title: vm.isLoginMode ? AppStrings.login : AppStrings.signUp) {
+                                hideKeyboard()
+                                Task {
+                                    if vm.isLoginMode {
+                                        await vm.loginUser()
+                                    } else {
+                                        await vm.createUser()
+                                    }
+                                }
+                            }
+                            .disabled(
+                                vm.isAuthButtonDisabled
+                            )
+                            
                         }
-                        .background(Color.black)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
-                        .disabled(vm.email.isEmpty || vm.password.isEmpty || (!isLogin && vm.name.isEmpty))
+                        .padding(20)
+                        .background(Color.appSecondaryBackground)
+                        .cornerRadius(20)
+                        .shadow(color: .black.opacity(0.05), radius: 10)
                         
-                    }
-                    .padding(20)
-                    .background(Color.white)
-                    .cornerRadius(20)
-                    .shadow(radius: 10)
-                    
-                    // 🔁 Toggle
-                    Button {
-                        withAnimation {
-                            isLogin.toggle()
-                            vm.resetFields()
+                        // MARK: - Toggle
+                        HStack {
+                            Text(vm.isLoginMode
+                                 ? AppStrings.noAccount
+                                 : AppStrings.alreadyAccount)
+                            .customFont(.medium, 14)
+                            .foregroundColor(Color.textFieldIconBackground)
+                            
+                            
+                            Button {
+                                withAnimation {
+                                    vm.isLoginMode.toggle()
+                                    vm.resetFields()
+                                }
+                            } label: {
+                                Text(vm.isLoginMode
+                                     ? AppStrings.signUp
+                                     : AppStrings.login)
+                                .foregroundColor(.blue)
+                                .customFont(.semiBold, 14)
+                            }
                         }
-                    } label: {
-                        Text(isLogin
-                             ? "Don't have an account? Sign Up"
-                             : "Already have an account? Login")
-                            .foregroundColor(.white)
-                            .font(.footnote)
+                        .font(.footnote)
+                        
+                        Spacer()
                     }
-                    
-                    Spacer()
+                    .padding()
                 }
-                .padding()
+            }
+            .onTapGesture {
+                hideKeyboard()
+            }
+            .toastView(toast: $vm.toast)
+            .loadingIndicator(isLoading: vm.isLoading)
+    }
+    
+    
+    var usernameStatusView: some View {
+        HStack(spacing: 6) {
+            
+            switch vm.usernameState {
+                
+            case .checking:
+                ProgressView()
+                    .scaleEffect(0.7)
+                
+                Text(AppStrings.checking)
+                    .customFont(.regular, 12)
+                    .foregroundColor(.gray)
+                
+            case .available:
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+                
+                Text(AppStrings.usernameAvailable)
+                    .customFont(.regular, 12)
+                    .foregroundColor(.green)
+                
+            case .taken:
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundColor(.red)
+                
+                Text(AppStrings.usernameTaken)
+                    .customFont(.regular, 12)
+                    .foregroundColor(.red)
+                
+            case .invalid(let message):
+                Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundColor(.orange)
+                
+                Text(message) // 👈 dynamic message from API
+                    .customFont(.regular, 12)
+                    .foregroundColor(.orange)
+                
+            default:
+                EmptyView()
             }
         }
-        .onTapGesture {
-            hideKeyboard() // 👈 dismiss on tap
-        }
-        .toastView(toast: $vm.toast)
+        .animation(.easeInOut, value: vm.usernameState) // 👈 BEST PLACE
+
     }
 }
 
-extension AuthView {
-    
-    func customTextField(
-        title: String,
-        text: Binding<String>,
-        field: Field,
-        keyboard: UIKeyboardType = .default
-    ) -> some View {
-        TextField(title, text: text)
-            .padding()
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(12)
-            .keyboardType(keyboard)
-            .textInputAutocapitalization(.never)
-            .focused($focusedField, equals: field)
-    }
-    
-    func customSecureField(
-        title: String,
-        text: Binding<String>,
-        field: Field
-    ) -> some View {
-        SecureField(title, text: text)
-            .padding()
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(12)
-            .focused($focusedField, equals: field)
-    }
+#Preview {
+    AuthView(
+        viewModel: AuthViewModel(
+            repository: AppDI.shared.authRepository
+        )
+    )
 }

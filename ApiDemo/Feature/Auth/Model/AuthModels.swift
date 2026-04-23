@@ -7,6 +7,18 @@
 
 import Foundation
 
+struct UserNameCheck: Codable {
+    let success: Bool
+    let available: Bool?
+    let message: String?
+}
+
+struct ResetPassword: Codable {
+    let success: Bool
+    let resetToken: String?
+    let message: String?
+}
+
 struct ApiResponse<T: Codable>: Codable {
     let success: Bool
     let message: String? // ✅ optional
@@ -22,6 +34,7 @@ struct AuthResponse: Codable {
 struct User: Codable, Identifiable {
     let id: String
     let name: String
+    let username: String
     let email: String?
     let createdAt: String?
     let updatedAt: String?
@@ -29,6 +42,7 @@ struct User: Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id = "_id"   // ✅ mapping fix
         case name
+        case username
         case email
         case createdAt
         case updatedAt

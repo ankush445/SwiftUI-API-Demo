@@ -69,3 +69,47 @@ struct PostCardView: View {
         .shadow(radius: 3)
     }
 }
+
+struct PostCardShimmer: View {
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            
+            HStack {
+                Circle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 40, height: 40)
+                
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 120, height: 14)
+                
+                Spacer()
+            }
+            
+            RoundedRectangle(cornerRadius: 4)
+                .fill(Color.gray.opacity(0.3))
+                .frame(height: 16)
+            
+            RoundedRectangle(cornerRadius: 4)
+                .fill(Color.gray.opacity(0.3))
+                .frame(height: 14)
+            
+            HStack {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 60, height: 14)
+                
+                Spacer()
+                
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 60, height: 14)
+            }
+        }
+        .padding()
+        .background(Color.white.opacity(0.9))
+        .cornerRadius(16)
+        .shimmer()
+    }
+}

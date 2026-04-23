@@ -1,15 +1,15 @@
 //
-//  HomeViewModel.swift
+//  PostViewModel.swift
 //  ApiDemo
 //
-//  Created by ios-22 on 17/04/26.
+//  Created by ios-22 on 23/04/26.
 //
 
 import SwiftUI
 import Observation
 import FancyToastKit
 @Observable
-final class HomeViewModel: ToastPresentable {
+final class UserPostViewModel: ToastPresentable {
     
     var posts: [Post] = []
     var isLoading = false
@@ -17,7 +17,7 @@ final class HomeViewModel: ToastPresentable {
     var toast: FancyToast?
     var isInitialLoading = true
 
-    
+    private let userId: String
     private let repository: PostRepositoryProtocol
     
     var nextCursor: String?
@@ -25,32 +25,33 @@ final class HomeViewModel: ToastPresentable {
     private var searchTask: Task<Void, Never>?
     private var likingIds: Set<String> = []
 
-    init(repository: PostRepositoryProtocol) {
+    init(repository: PostRepositoryProtocol, userId: String) {
         self.repository = repository
+        self.userId = userId
     }
     
     // MARK: - Initial Load
     func loadPosts() async {
         isInitialLoading = true
         reset()
-        await fetchPosts()
+        await fetchUserPosts()
         await MainActor.run {
             isInitialLoading = false
         }
     }
-    
     // MARK: - Pagination
     
-    func fetchPosts() async {
+    func fetchUserPosts() async {
         guard !isLoading, hasMore else { return }
         
         isLoading = true
         defer { isLoading = false }
         
         do {
-            let response = try await repository.fetchPosts(
+            let response = try await repository.fetchUserPosts(
                 cursor: nextCursor,
-                search:searchText
+                search:searchText,
+                userId: userId
             )
             
             posts.append(contentsOf: response.posts)
@@ -90,25 +91,6 @@ final class HomeViewModel: ToastPresentable {
         hasMore = true
     }
     
-    
-    // MARK: - Create Post
-    func createPost(title: String, description: String?) async {
-        guard !isLoading else { return }
-        
-        isLoading = true
-        defer { isLoading = false }
-        
-        do {
-            let response = try await repository.createPost(title: title, description: description)
-            await MainActor.run {
-                showSuccess(message: response.message ?? "Post Created Successfully")
-            }
-        } catch {
-            await MainActor.run {
-                showError(error)
-            }
-        }
-    }
     
     // MARK: - Like
     func toggleLike(post: Post) {

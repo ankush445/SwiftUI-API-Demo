@@ -17,20 +17,13 @@ protocol PostRepositoryProtocol {
     func getReplies(commentId: String, cursor: String?) async throws -> CommentListResponse
 
     
-    func addReply(
-        postId: String,
-        parentId: String,
-        text: String
-    ) async throws -> CommentResponse
+    func addReply(postId: String,parentId: String,text: String) async throws -> CommentResponse
     func likeComment(commentId: String) async throws -> LikeModel
+    func fetchUserPosts(cursor: String?, search: String?,userId:String) async throws -> PostListResponse
+
 }
 
 final class PostRepository: PostRepositoryProtocol {
-
-    
-
-    
-
     
     private let networkService: NetworkServiceProtocol
 
@@ -82,4 +75,10 @@ final class PostRepository: PostRepositoryProtocol {
         )
     }
     
+    func fetchUserPosts(cursor: String?, search: String?, userId:String) async throws -> PostListResponse {
+        return try await networkService.request(
+            APIEndpoint.getUserPosts(cursor: cursor, search: search, limit: 10, id: userId),
+            responseType: PostListResponse.self
+        )
+    }
 }

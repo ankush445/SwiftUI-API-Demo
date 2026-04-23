@@ -7,12 +7,18 @@
 import Foundation
 final class UserManager {
     static let shared = UserManager()
+    private let resetToken = "resetToken"
 
     private let userKey = "loggedInUser"
     private let loginKey = "isLoggedIn"
 
     // MARK: - Login State
-    
+    func saveResetToken(_ token: String) {
+        UserDefaults.standard.set(token, forKey: resetToken)
+    }
+    func getResetToken() -> String? {
+        UserDefaults.standard.string(forKey: resetToken)
+    }
     func setLoggedIn(_ value: Bool) {
         UserDefaults.standard.set(value, forKey: loginKey)
     }

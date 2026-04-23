@@ -31,13 +31,17 @@ enum APIEndpoint: APIEndpointProtocol {
     
     // Auth
     case getRefreshToken
-    case signUp(name: String, email: String, password: String)
+    case checkUsername(userName: String?)
+    case signUp(name: String, userName: String, email: String, password: String)
     case login(email: String, password: String)
+    case forgotPassword(email: String)
+    case resetPassword(token: String, password: String)
     case logout
     case delete
     
     // Post
     case getFeed(cursor: String?, search: String?, limit: Int)
+    case getUserPosts(cursor: String?, search: String?, limit: Int, id: String)
     case createPost(title: String, content: String?)
     case postLike(id: String)
     case addComment(postId: String, text: String)
@@ -57,12 +61,19 @@ enum APIEndpoint: APIEndpointProtocol {
     
     var path: String {
         switch self {
+        case.checkUsername:
+            return "/users/check-username"
         case .getRefreshToken:
             return "/users/refresh-token"
         case .signUp:
             return "/users/signup"
         case .login:
             return "/users/login"
+        case .forgotPassword(let email):
+            return "/users/forgot-password"
+
+        case .resetPassword( let token,let password):
+            return "/users/reset-password"
         case .delete:
             return "/users/delete"
         case .logout:
@@ -71,6 +82,8 @@ enum APIEndpoint: APIEndpointProtocol {
            // POST
         case .getFeed:
             return "/posts/feed"
+        case .getUserPosts(_,_,_, let id):
+            return "posts/user/\(id)"
         case .createPost:
             return "/posts/create-post"
     
@@ -86,14 +99,18 @@ enum APIEndpoint: APIEndpointProtocol {
             return "/comments/\(commentId)/replies"
         case .commentLike(let commentId):
             return "/comments/\(commentId)/like"
+            
+       
+
+
         }
     }
     
     var method: HTTPMethod {
         switch self {
-        case .getFeed,.getComment, .getRepliesComment:
+        case .getFeed,.getUserPosts,.getComment, .getRepliesComment, .checkUsername:
             return .get
-        case .signUp ,.login,.getRefreshToken, .logout, .createPost,.postLike, .addComment, .addReply, .commentLike:
+        case .signUp ,.login,.getRefreshToken, .logout, .createPost,.postLike, .addComment, .addReply, .commentLike, .forgotPassword, .resetPassword:
             return .post
         case .delete:
             return .delete
@@ -109,10 +126,15 @@ enum APIEndpoint: APIEndpointProtocol {
     
     var body: [String: Any]? {
         switch self {
-        case .signUp(let name, let email, let password):
-            return ["name": name, "email": email, "password": password]
+        case .signUp(let name, let username, let email, let password):
+            return ["name": name,"username": username,"email": email, "password": password]
         case .login( let email, let password):
             return ["email": email, "password": password]
+            
+        case .forgotPassword(let email):
+            return ["email": email]
+        case .resetPassword(let token, let password):
+            return ["token": token, "password": password]
         case .getRefreshToken:
             return [:]
         case .createPost(let title, let content):
@@ -130,6 +152,12 @@ enum APIEndpoint: APIEndpointProtocol {
     }
     var queryItems: [URLQueryItem]? {
         switch self {
+        case .checkUsername(let username):
+            var items: [URLQueryItem] = []
+            if let username = username {
+                items.append(URLQueryItem(name: "username", value: username))
+            }
+            return items
         case .getFeed(let cursor, let search, let limit):
             var items: [URLQueryItem] = []
             if let cursor = cursor {
@@ -142,7 +170,17 @@ enum APIEndpoint: APIEndpointProtocol {
 
             
             return items
+        case .getUserPosts(let cursor, let search, let limit, _):
+            var items: [URLQueryItem] = []
+            if let cursor = cursor {
+                items.append(URLQueryItem(name: "cursor", value: cursor))
+            }
+            if let query = search, !query.isEmpty {
+                items.append(URLQueryItem(name: "search", value: search))
+            }
+            items.append(URLQueryItem(name: "limit", value: "\(limit)"))
             
+            return items
         case .getComment(_, let cursor):
             var items: [URLQueryItem] = []
             if let cursor = cursor {

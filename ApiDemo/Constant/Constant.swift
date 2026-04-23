@@ -7,8 +7,6 @@
 
 struct Constant{
     
-    struct UserDefaultsKey {
-        
-        
-    }
+  
 }
+ 

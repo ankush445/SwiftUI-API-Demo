@@ -52,7 +52,13 @@ struct SettingsView: View {
             
             // ⚙️ Options
             Section("Account") {
-                NavigationLink("My Posts") { Text("My Posts") }
+                NavigationLink("My Posts") {
+                    if let user = session.user {
+                        UserPostView(viewModel: UserPostViewModel(repository: AppDI.shared.postRepository, userId: user.id), session: session)
+                    }else {
+                        Text("My Post")
+                    }
+                }
                 NavigationLink("Edit Profile") { Text("Edit Profile") }
                 NavigationLink("Terms & Conditions") { Text("Terms") }
                 NavigationLink("Privacy Policy") { Text("Privacy") }
