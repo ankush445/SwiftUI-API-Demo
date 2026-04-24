@@ -23,15 +23,27 @@ struct ForgotPasswordView: View {
             
             VStack(spacing: 24) {
                 
-                Spacer(minLength: 40)
-                    .frame(height: 40)
+                Spacer(minLength: 20)
+                    .frame(height: 20)
+                // MARK: - Logo
+                ZStack {
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(
+                            Color(hex: "#E1DFFF")
+                        )
+                        .frame(width: 70, height: 70)
+                    
+                    Image(systemName: "lock.rotation")
+                        .foregroundStyle(.likeBackground)
+                        .font(.system(size: 28))
+                }
                 
                 Text(AppStrings.forgotPassword)
                     .customFont(.bold, 24)
 
                 Text(AppStrings.resetPasswordSubtitle)
                     .customFont(.regular, 14)
-                    .foregroundColor(Color.textFieldIconBackground)
+                    .foregroundStyle(Color.textFieldIconBackground)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
                 
@@ -40,7 +52,7 @@ struct ForgotPasswordView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(AppStrings.email)
                             .customFont(.semiBold, 14)
-                            .foregroundColor(Color.textFieldIconBackground)
+                            .foregroundStyle(Color.textFieldIconBackground)
                         
                         inputField(
                             icon: "envelope",

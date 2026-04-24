@@ -115,8 +115,6 @@ struct CreatePostView: View {
         .onAppear {
             focusedField = .title // ✅ auto-focus on open
         }
-        .presentationDetents([.medium, .large])        // ✅ sheet sizing
-        .presentationDragIndicator(.visible)
     }
 
     // MARK: - Subviews

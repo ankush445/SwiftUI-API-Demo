@@ -28,11 +28,15 @@ struct CommentView: View {
             
             // 🔝 Header
             HStack {
+                Spacer()
                 Text("Comments")
-                    .font(.headline)
+                    .customFont(.semiBold, 18)
+                    .foregroundStyle(.primaryText)
+
                 Spacer()
             }
             .padding()
+            .padding(.top, 10)
             
             Divider()
             
@@ -41,9 +45,14 @@ struct CommentView: View {
                 LazyVStack(spacing: 16) {
                     
                     if vm.comments.isEmpty && !vm.isLoading {
+                        Spacer()
+                            .frame(height: 50)
+                        
                         Text("No comments yet")
-                            .foregroundColor(.gray)
-                            .padding(.top, 50)
+                            .customFont(.medium, 15)
+                            .foregroundStyle(.secondaryText)
+                            
+                        Spacer()
                     }
                     
                     else {
@@ -81,11 +90,11 @@ struct CommentView: View {
                         avatarSmall(replying.user.name)
                         VStack(alignment: .leading) {
                             Text("Replying to \(replying.user.name)")
-                                .font(.subheadline)
-                                .foregroundColor(.black)
+                                .customFont(.medium, 14)
+                                .foregroundStyle(.primaryText)
                             Text(replying.text)
-                                .font(.caption)
-                                .foregroundColor(.black.opacity(0.8))
+                                .customFont(.regular, 13)
+                                .foregroundStyle(.secondaryText)
                         }
                         
                         Spacer()
@@ -93,8 +102,8 @@ struct CommentView: View {
                         Button("Cancel") {
                             vm.replyingTo = nil
                         }
-                        .font(.headline)
-                        .tint(.blue)
+                        .customFont(.medium, 14)
+                        .foregroundStyle(.likeBackground)
                     }
                     .padding(.horizontal)
                 }
@@ -110,7 +119,7 @@ struct CommentView: View {
                     )
                     .focused($isFocused)
                     .padding(10)
-                    .background(Color(.systemGray6))
+                    .background(Color.textFieldBackground)
                     .cornerRadius(20)
                     
                     Button("Post") {
@@ -131,14 +140,14 @@ struct CommentView: View {
                             isFocused = false
                         }
                     }
-                    .fontWeight(.semibold)
+                    .customFont(.semiBold)
                     .disabled(text.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
                 .padding()
             }
-            .background(Color.white)
+            .background(Color.appSecondaryBackground)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color.appBackground)
         .onAppear {
             Task {
                 await vm.fetchComments(postId: post.id)
@@ -179,13 +188,13 @@ struct CommentRowView: View {
                     HStack {
                         Rectangle()
                             .frame(width: 20, height: 1)
-                            .foregroundColor(.gray.opacity(0.5))
+                            .foregroundColor(.secondaryText.opacity(0.5))
                         
                         Text(isExpanded
                              ? "Hide replies"
                              : "View \(comment.replyCount) replies")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                        .customFont(.medium, 13)
+                        .foregroundColor(.secondaryText)
                     }
                 }
                 .buttonStyle(.plain)
@@ -238,16 +247,18 @@ struct CommentRowView: View {
                 // ✅ Username + Text (Instagram style)
                 HStack {
                     Text("\(comment.user.name) ")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
+                        .customFont(.semiBold,16)
+                        .foregroundStyle(.primaryText)
                     Text(timeAgo(comment.createdAt))
-                        .font(.caption)
-                        .foregroundColor(.gray)
+                        .customFont(.regular,13)
+                        .foregroundStyle(.secondaryText)
                 }
               
                 Text(comment.text)
-                        .font(.subheadline)
-                
+                    .customFont(.regular,14)
+                    .foregroundStyle(.primaryText)
+
+
                 
                 Button {
                     vm.replyingTo = comment
@@ -262,8 +273,8 @@ struct CommentRowView: View {
                     }
                 } label: {
                     Text("Reply")
-                        .foregroundStyle(.blue)
-                        .font(.subheadline)
+                        .customFont(.medium, 14)
+                        .foregroundStyle(.likeBackground)
                 }
                 .buttonStyle(.plain)
                 
@@ -279,15 +290,15 @@ struct CommentRowView: View {
                     }
                 } label: {
                     Image(systemName: comment.isLiked ? "heart.fill" : "heart")
-                        .foregroundColor(comment.isLiked ? .red : .gray)
+                        .foregroundColor(comment.isLiked ? .likeBackground : .textFieldIconBackground)
                 }
                 .buttonStyle(.plain)
                 .contentShape(Rectangle()) // ✅ precise tap area
                 
                 if comment.likeCount > 0 {
                     Text("\(comment.likeCount)")
-                        .font(.caption)
-                        .foregroundColor(.gray)
+                        .customFont(.regular, 13)
+                        .foregroundStyle(.secondaryText)
                 }
             }
         }
@@ -302,7 +313,7 @@ func avatarSmall(_ name: String) -> some View {
             .fill(dynamicColor(for: name))
             .frame(width: 36, height: 36)
         Text(name.prefix(1))
-            .font(.caption)
+            .customFont(.medium, 14)
             .foregroundColor(.white)
     }
 } 

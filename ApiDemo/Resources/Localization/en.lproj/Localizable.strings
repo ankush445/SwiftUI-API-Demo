@@ -32,3 +32,10 @@
 
 "auth.google" = "Google";
 "auth.facebook" = "Facebook";
+// Tabs
+
+"tab.home" = "Home";
+"tab.search" = "Search";
+"tab.create" = "Create";
+"tab.messages" = "Messages";
+"tab.profile" = "Profile";

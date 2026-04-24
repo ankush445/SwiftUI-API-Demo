@@ -18,11 +18,11 @@ enum AppTab: Int, CaseIterable {
 
     var title: String {
         switch self {
-        case .home:       return "Home"
-        case .search:     return "Search"
-        case .createPost: return "Create"
-        case .messages:   return "Messages"
-        case .profile:    return "Profile"
+        case .home:       return AppStrings.home
+        case .search:     return AppStrings.search
+        case .createPost: return AppStrings.create
+        case .messages:   return AppStrings.messages
+        case .profile:    return AppStrings.profile
         }
     }
 

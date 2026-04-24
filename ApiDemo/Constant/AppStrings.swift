@@ -47,6 +47,13 @@ enum AppStrings {
     // MARK: - Social
     static let google = localized("auth.google")
     static let facebook = localized("auth.facebook")
+    
+    // MARK: - Tabs
+    static let home = localized("tab.home")
+    static let search = localized("tab.search")
+    static let create = localized("tab.create")
+    static let messages = localized("tab.messages")
+    static let profile = localized("tab.profile")
 }
 
 // 🔑 Localization Helper

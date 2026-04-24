@@ -35,3 +35,19 @@ func timeAgo(_ dateString: String) -> String {
     default: return "\(seconds / 86400)d"
     }
 }
+
+func makeCaption(username: String, content: String) -> AttributedString {
+    
+    var attributed = AttributedString(username + " " + content)
+    
+    if let usernameRange = attributed.range(of: username) {
+        attributed[usernameRange].font = .system(size: 14, weight: .semibold)
+    }
+    
+    if let contentRange = attributed.range(of: content) {
+        attributed[contentRange].font = .system(size: 14, weight: .regular)
+        attributed[contentRange].foregroundColor = .secondaryText
+    }
+    
+    return attributed
+}

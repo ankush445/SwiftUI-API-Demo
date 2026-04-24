@@ -33,7 +33,7 @@ struct AuthView: View {
                                 .frame(width: 70, height: 70)
                             
                             Image(systemName: "camera.fill")
-                                .foregroundColor(.white)
+                                .foregroundStyle(.white)
                                 .font(.system(size: 28))
                         }
                         
@@ -45,7 +45,7 @@ struct AuthView: View {
                              ? AppStrings.loginSubtitle
                              : AppStrings.signupSubtitle)
                         .customFont(.medium, 15)
-                        .foregroundColor(Color.textFieldIconBackground)
+                        .foregroundStyle(Color.textFieldIconBackground)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                         
@@ -56,7 +56,7 @@ struct AuthView: View {
                                 VStack(alignment: .leading, spacing: 6) {
                                     Text(AppStrings.fullName)
                                         .customFont(.semiBold, 14)
-                                        .foregroundColor(Color.textFieldIconBackground)
+                                        .foregroundStyle(Color.textFieldIconBackground)
                                     inputField(
                                         icon: "person",
                                         placeholder: AppStrings.fullName,
@@ -66,7 +66,7 @@ struct AuthView: View {
                                 VStack(alignment: .leading, spacing: 6) {
                                     Text(AppStrings.username)
                                         .customFont(.semiBold, 14)
-                                        .foregroundColor(Color.textFieldIconBackground)
+                                        .foregroundStyle(Color.textFieldIconBackground)
                                     inputField(
                                         icon: "at",
                                         placeholder: AppStrings.username,
@@ -83,7 +83,7 @@ struct AuthView: View {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text(AppStrings.email)
                                     .customFont(.semiBold, 14)
-                                    .foregroundColor(Color.textFieldIconBackground)
+                                    .foregroundStyle(Color.textFieldIconBackground)
                                 inputField(
                                     icon: "envelope",
                                     placeholder: AppStrings.email,
@@ -95,7 +95,7 @@ struct AuthView: View {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text(AppStrings.password)
                                     .customFont(.semiBold, 14)
-                                    .foregroundColor(Color.textFieldIconBackground)
+                                    .foregroundStyle(Color.textFieldIconBackground)
                                 SecureInputField(
                                     icon: "lock",
                                     placeholder: AppStrings.password,
@@ -111,7 +111,7 @@ struct AuthView: View {
                                         } label: {
                                             Text(AppStrings.forgotPassword)
                                                 .customFont(.semiBold, 14)
-                                                .foregroundColor(Color(hex: "#433FE5"))
+                                                .foregroundStyle(.likeBackground)
                                         }
                                     }
                                 }
@@ -144,7 +144,7 @@ struct AuthView: View {
                                  ? AppStrings.noAccount
                                  : AppStrings.alreadyAccount)
                             .customFont(.medium, 14)
-                            .foregroundColor(Color.textFieldIconBackground)
+                            .foregroundStyle(Color.textFieldIconBackground)
                             
                             
                             Button {
@@ -156,7 +156,7 @@ struct AuthView: View {
                                 Text(vm.isLoginMode
                                      ? AppStrings.signUp
                                      : AppStrings.login)
-                                .foregroundColor(.blue)
+                                .foregroundStyle(.likeBackground)
                                 .customFont(.semiBold, 14)
                             }
                         }
