@@ -50,10 +50,25 @@ enum AppStrings {
     
     // MARK: - Tabs
     static let home = localized("tab.home")
-    static let search = localized("tab.search")
+    static let friends = localized("tab.friends")
     static let create = localized("tab.create")
     static let messages = localized("tab.messages")
     static let profile = localized("tab.profile")
+    
+    static let search = localized("tab.search")
+    static let suggested = localized("suggested")
+    static let friendRequests = localized("friendRequests")
+    static let seeAll = localized("seeAll")
+    static let requested = localized("requested")
+    static let follow = localized("follow")
+    static let following = localized("following")
+    static let wantsToFollowYou = localized("wantsToFollowYou")
+    static let accept = localized("accept")
+    static let delete = localized("delete")
+    static let results = NSLocalizedString("results", comment: "")
+    static let noUsersFound = NSLocalizedString("no_users_found", comment: "")
+    static let noFriendsYet = NSLocalizedString("no_friends_yet", comment: "")
+
 }
 
 // 🔑 Localization Helper

@@ -11,30 +11,30 @@ enum AuthRoute: Hashable {
 
 enum AppTab: Int, CaseIterable {
     case home
-    case search
+    case friends
     case createPost
     case messages
     case profile
 
-    var title: String {
-        switch self {
-        case .home:       return AppStrings.home
-        case .search:     return AppStrings.search
-        case .createPost: return AppStrings.create
-        case .messages:   return AppStrings.messages
-        case .profile:    return AppStrings.profile
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .home:       return "house.fill"
-        case .search:     return "magnifyingglass"
-        case .createPost: return "plus.app.fill"
-        case .messages:   return "message.fill"
-        case .profile:    return "person.crop.circle.fill"
-        }
-    }
+//    var title: String {
+//        switch self {
+//        case .home:       return AppStrings.home
+//        case .friends:     return AppStrings.friends
+//        case .createPost: return AppStrings.create
+//        case .messages:   return AppStrings.messages
+//        case .profile:    return AppStrings.profile
+//        }
+//    }
+//
+//    var icon: String {
+//        switch self {
+//        case .home:       return "house.fill"
+//        case .friends:     return "person.3"
+//        case .createPost: return "plus.app.fill"
+//        case .messages:   return "message.fill"
+//        case .profile:    return "person.crop.circle.fill"
+//        }
+//    }
 }
 
 // MARK: - Per-Tab Routes
@@ -45,10 +45,10 @@ enum HomeRoute: Hashable {
     case comments(postID: String)
 }
 
-enum SearchRoute: Hashable {
-    case searchResults(query: String)
-    case userProfile(userID: String)
-    case postDetail(postID: String)
+enum FriendRoute: Hashable {
+    case FriendRequest
+//    case userProfile(userID: String)
+//    case postDetail(postID: String)
 }
 
 enum MessagesRoute: Hashable {
@@ -105,7 +105,7 @@ final class NavigationManager {
 
     // MARK: Per-tab stacks
     var homePath:     NavigationPath = NavigationPath()
-    var searchPath:   NavigationPath = NavigationPath()
+    var friendPath:   NavigationPath = NavigationPath()
     var messagesPath: NavigationPath = NavigationPath()
     var profilePath:  NavigationPath = NavigationPath()
 
@@ -124,14 +124,15 @@ final class NavigationManager {
     func showResetPassword() {
         authPath.append(AuthRoute.resetPassword)
     }
-
+    ///  Pop one screen
+    func authPop() {
+        authPath.removeLast()
+    }
     /// Pops entire auth stack back to Login.
     func popToLogin() {
         authPath = NavigationPath()
     }
-    func authPop() {
-        authPath.removeLast()
-    }
+    
 
     // ─────────────────────────────────────────
     // MARK: Tab Actions
@@ -149,7 +150,7 @@ final class NavigationManager {
     func popToRoot(for tab: AppTab) {
         switch tab {
         case .home:       homePath     = NavigationPath()
-        case .search:     searchPath   = NavigationPath()
+        case .friends:     friendPath   = NavigationPath()
         case .messages:   messagesPath = NavigationPath()
         case .profile:    profilePath  = NavigationPath()
         case .createPost: break
@@ -158,7 +159,7 @@ final class NavigationManager {
 
     func resetAllTabs() {
         homePath     = NavigationPath()
-        searchPath   = NavigationPath()
+        friendPath   = NavigationPath()
         messagesPath = NavigationPath()
         profilePath  = NavigationPath()
         selectedTab  = .home
@@ -174,12 +175,18 @@ final class NavigationManager {
     }
 
     // ─────────────────────────────────────────
-    // MARK: Search
+    // MARK: Friends
     // ─────────────────────────────────────────
 
-    func pushSearch(_ route: SearchRoute) {
-        selectedTab = .search
-        searchPath.append(route)
+    func pushFriend(_ route: FriendRoute) {
+        selectedTab = .friends
+        friendPath.append(route)
+    }
+    
+     
+    func popFriend() {
+        selectedTab = .friends
+        friendPath.removeLast()
     }
 
     // ─────────────────────────────────────────

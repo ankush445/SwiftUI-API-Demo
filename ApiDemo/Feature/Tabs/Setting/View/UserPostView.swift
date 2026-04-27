@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftUI_Loader
 struct UserPostView: View {
     
     @State private var vm: UserPostViewModel

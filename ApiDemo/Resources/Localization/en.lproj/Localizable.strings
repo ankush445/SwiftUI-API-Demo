@@ -35,7 +35,21 @@
 // Tabs
 
 "tab.home" = "Home";
+"tab.friends" = "Friends";
 "tab.search" = "Search";
 "tab.create" = "Create";
 "tab.messages" = "Messages";
 "tab.profile" = "Profile";
+
+"suggested" = "Suggested";
+"requested" = "Requested";
+"follow" = "Follow";
+"following" = "Following";
+"friendRequests" = "Friend Requests";
+"seeAll" = "See All";
+"wantsToFollowYou" = "Wants to follow you";
+"accept" = "Accept";
+"delete" = "Delete";
+"results" = "Results";
+"no_users_found" = "No users found";
+"no_friends_yet" = "No friends yet";

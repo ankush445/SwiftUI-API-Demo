@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import SwiftUI_Loader
-import FancyToastKit
 struct HomeView: View {
     
     @State private var vm: HomeViewModel
@@ -18,6 +16,12 @@ struct HomeView: View {
     @State private var navigateToSettings = false
     @State private var selectedPost: Post?
     
+    // For Scrolling
+    @State private var naturalScrollOffset:CGFloat = 0
+    @State private var lastNaturalOffset:CGFloat = 0
+    @State private var headerOffset:CGFloat = 0
+    @State private var isScrollingUp:Bool = false
+
     let storyUsers = ["You", "Elena", "Marcus", "Sasha", "Julian"]
     
     init(viewModel: HomeViewModel, session: SessionManager) {
@@ -26,15 +30,14 @@ struct HomeView: View {
     }
     
     var body: some View {
-     
-        VStack{
-            // 📜 Feed
+        
+        
+        GeometryReader{
+            let safeArea = $0.safeAreaInsets
+            let headerHeight = 110 + safeArea.top
             ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: 16) {
-            
-                       
-                    storiesView
-                        .padding(.top, 16)
+                    
                     // 🔥 SHIMMER (FIRST LOAD)
                     if vm.isInitialLoading {
                         ForEach(0..<5, id: \.self) { _ in
@@ -44,6 +47,8 @@ struct HomeView: View {
                     
                     // ✅ REAL DATA
                     else if !vm.posts.isEmpty {
+                        Spacer()
+                            .frame(height: 10)
                         ForEach(vm.posts) { post in
                             PostCardView(
                                 post: post,
@@ -60,6 +65,8 @@ struct HomeView: View {
                                 }
                             }
                         }
+                        Spacer()
+                            .frame(height: 40)
                         
                         if vm.nextCursor != nil && vm.isLoading {
                             ProgressView()
@@ -89,61 +96,36 @@ struct HomeView: View {
                     await vm.refresh()
                 }.value
             }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                headerView()
+                    .padding(.bottom, 15)
+                    .frame(height: headerHeight, alignment: .bottom)
+                    .background(Color.appSecondaryBackground)
+                    .offset(y: -headerOffset)
+                    .clipped() // 👈 important
+
+            }
+            .onScrollGeometryChange(for: CGFloat.self) { proxy in
+                let maxHeight = proxy.contentSize.height - proxy.containerSize.height
+                return max(min(proxy.contentOffset.y + headerHeight, maxHeight), 0)
+            } action: { oldValue, newValue in
+                let isScrollingUp = oldValue < newValue
+                headerOffset = min(max(newValue - lastNaturalOffset,0), headerHeight)
+                self.isScrollingUp = isScrollingUp
+                naturalScrollOffset = newValue
+            }
+            .onChange(of: isScrollingUp, { oldValue, newValue in
+                lastNaturalOffset = naturalScrollOffset - headerOffset
+            })
+            .ignoresSafeArea(.container, edges: .top)
             
             
         }
         .loadingIndicator(isLoading: (vm.isLoading && vm.nextCursor == nil))
-        .navigationBarHidden(false) // 👈 Important: show nav bar
-        .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    
-                } label: {
-                    
-                    
-                    Image(systemName: "camera")
-                        .customFont(.semiBold, 20)
-                        .foregroundStyle(.buttonBackground)
-                }
-            }
-            ToolbarItem(placement: .principal) {
-                Text(AppStrings.appName)
-                    .customFont(.semiBold, 18)
-                    .foregroundStyle(.primaryText)
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    // action
-                } label: {
-                    Image(systemName: "bell")
-                        .customFont(.semiBold, 20)
-                        .foregroundStyle(.textFieldIconBackground)
-                }
-            }
-          
-        }
-        .toolbarBackground(Color.appSecondaryBackground, for: .navigationBar) // Set navigation background color
-        .toolbarBackground(.visible, for: .navigationBar)
-        
-        // Make sure it's visible
-        // 🔍 Search
-//        .searchable(text: $vm.searchText)
-//        .onChange(of: vm.searchText) { _, _ in
-//            vm.scheduleSearch()
-//        }
+        .toastView(toast: $vm.toast)
         .task {
             await vm.loadPosts()
         }
-//        .sheet(isPresented: $showCreatePost) {
-//            CreatePostView(session: session) { title, desc in
-//                Task {
-//                    await vm.createPost(title: title, description: desc)
-//                }
-//            }
-//        }
         .sheet(item: $selectedPost) { post in
             CommentView(post: post, viewModel: CommentViewModel(repository: AppDI.shared.postRepository), session: session)
                 .presentationDetents([.medium, .large]) // ✅ medium + expandable
@@ -151,10 +133,7 @@ struct HomeView: View {
                 .presentationCornerRadius(20)           // ✅ modern rounded sheet
                 .interactiveDismissDisabled(false)
         }
-//        .navigationDestination(isPresented: $navigateToSettings) {
-//            SettingsView(viewModel: SettingViewModel(repository: AppDI.shared.settingRepository, session: session), session: session)
-//        }
-//        .toastView(toast: $vm.toast)
+        
         .onReceive(NotificationCenter.default.publisher(for: .commentUpdated)) { notification in
             
             guard let postId = notification.userInfo?["postId"] as? String else { return }
@@ -166,6 +145,46 @@ struct HomeView: View {
         
     }
     
+        
+    
+    
+    @ViewBuilder
+    func headerView()-> some  View{
+        
+        VStack(spacing: 10){
+            HStack{
+                Button {
+                    
+                } label: {
+                    
+                    
+                    Image(systemName: "camera")
+                        .customFont(.semiBold, 20)
+                        .foregroundStyle(.buttonBackground)
+                }
+                Spacer()
+                Text(AppStrings.appName)
+                    .customFont(.semiBold, 20)
+                    .foregroundStyle(.primaryText)
+                Spacer()
+                Button {
+                    // action
+                } label: {
+                    Image(systemName: "bell")
+                        .customFont(.semiBold, 20)
+                        .foregroundStyle(.textFieldIconBackground)
+                }
+            }
+            .padding(.horizontal)
+
+            
+            CustomSearchBar(text: $vm.searchText, placeholder: AppStrings.search)
+                .padding(.horizontal)
+                .onChange(of: vm.searchText) { oldValue, newValue in
+                    vm.scheduleSearch()
+                }
+        }
+    }
 
     var storiesView: some View {
         ScrollView(.horizontal, showsIndicators: false) {

@@ -28,4 +28,7 @@ final class AppDI {
     lazy var settingRepository: SettingRepositoryProtocol = SettingRepository(
         networkService: networkService
     )
+    lazy var friendRepository: FriendRepositoryProtocol = FriendRepository(
+        networkService: networkService
+    )
 }

@@ -6,11 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		F7393ADB2F696C57007E3355 /* SwiftUI_Loader in Frameworks */ = {isa = PBXBuildFile; productRef = F7393ADA2F696C57007E3355 /* SwiftUI_Loader */; };
-		F7DAE7982F6A7C0500FF74FB /* FancyToastKit in Frameworks */ = {isa = PBXBuildFile; productRef = F7DAE7972F6A7C0500FF74FB /* FancyToastKit */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
 		F79E47AF2F61742E00BE04B2 /* ApiDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ApiDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -41,8 +36,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F7393ADB2F696C57007E3355 /* SwiftUI_Loader in Frameworks */,
-				F7DAE7982F6A7C0500FF74FB /* FancyToastKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,8 +78,6 @@
 			);
 			name = ApiDemo;
 			packageProductDependencies = (
-				F7393ADA2F696C57007E3355 /* SwiftUI_Loader */,
-				F7DAE7972F6A7C0500FF74FB /* FancyToastKit */,
 			);
 			productName = ApiDemo;
 			productReference = F79E47AF2F61742E00BE04B2 /* ApiDemo.app */;
@@ -117,8 +108,6 @@
 			mainGroup = F79E47A62F61742E00BE04B2;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				F7393AD92F696C57007E3355 /* XCRemoteSwiftPackageReference "SwiftUI_Loader" */,
-				F7DAE7962F6A7C0500FF74FB /* XCRemoteSwiftPackageReference "FancyToastKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F79E47B02F61742E00BE04B2 /* Products */;
@@ -358,38 +347,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		F7393AD92F696C57007E3355 /* XCRemoteSwiftPackageReference "SwiftUI_Loader" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ankush445/SwiftUI_Loader.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-		F7DAE7962F6A7C0500FF74FB /* XCRemoteSwiftPackageReference "FancyToastKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ankush445/FancyToastKit.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		F7393ADA2F696C57007E3355 /* SwiftUI_Loader */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F7393AD92F696C57007E3355 /* XCRemoteSwiftPackageReference "SwiftUI_Loader" */;
-			productName = SwiftUI_Loader;
-		};
-		F7DAE7972F6A7C0500FF74FB /* FancyToastKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F7DAE7962F6A7C0500FF74FB /* XCRemoteSwiftPackageReference "FancyToastKit" */;
-			productName = FancyToastKit;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F79E47A72F61742E00BE04B2 /* Project object */;
 }

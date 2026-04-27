@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import SwiftUI_Loader
-import FancyToastKit
 struct ForgotPasswordView: View {
     
     @State var viewModel: AuthViewModel

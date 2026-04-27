@@ -21,29 +21,39 @@ struct MainTabView: View {
                     )
                     .navigationDestination(for: HomeRoute.self) { route in
                         
-                        switch route {
-                        case .postDetail(let id):
-                           Text("Post")
-                        case .userProfile(let id):                           Text("Post")
-
-                        case .comments(let id):                               Text("Post")
-
-                        }
+//                        switch route {
+//                        case .postDetail(let id):
+//                           Text("Post")
+//                        case .userProfile(let id):                           Text("Post")
+//
+//                        case .comments(let id):                               Text("Post")
+//
+//                        }
                     }
                 }
                 .tag(AppTab.home)
+            
 
-                NavigationStack(path: $nav.searchPath) {
-//                    SearchView()
-//                        .navigationDestination(for: SearchRoute.self) { route in
-//                            switch route {
-//                            case .searchResults(let q): SearchResultsView(query: q)
-//                            case .userProfile(let id):  UserProfileView(userID: id)
-//                            case .postDetail(let id):   PostDetailView(postID: id)
-//                            }
+                NavigationStack(path: $nav.friendPath) {
+                    FriendView(
+                        viewModel: FriendViewModel(repository: AppDI.shared.friendRepository)                    )
+                    .navigationDestination(for: FriendRoute.self) { route in
+                        switch route  {
+                        case .FriendRequest:
+                            FriendRequestView(viewModel: FriendViewModel(repository: AppDI.shared.friendRepository) )
+                       
+                        }
+//                        switch route {
+//                        case .postDetail(let id):
+//                           Text("Post")
+//                        case .userProfile(let id):                           Text("Post")
+//
+//                        case .comments(let id):                               Text("Post")
+//
 //                        }
+                    }
                 }
-                .tag(AppTab.search)
+                .tag(AppTab.friends)
 
                 // Placeholder — intercepted by onChange below
                 Color.clear.tag(AppTab.createPost)
@@ -83,6 +93,8 @@ struct MainTabView: View {
                     set: { nav.switchTab(to: $0) }
                 )
             )
+            .ignoresSafeArea(.keyboard, edges: .bottom)
+
         }
         .sheet(item: $nav.activeSheet) { sheet in
 //            switch sheet {
@@ -110,13 +122,14 @@ struct MainTabView: View {
 struct CustomTabBar: View {
     @Binding var selectedTab: AppTab
 
-    private let tabs: [AppTab] = [.home, .search, .createPost, .messages, .profile]
+    private let tabs: [AppTab] = [.home, .friends, .createPost, .messages, .profile]
 
     var body: some View {
         ZStack(alignment: .top) {
             // Bar background
-            Color.appSecondaryBackground.ignoresSafeArea()
-
+            Color.appSecondaryBackground
+                           // ✅ Extend background into home indicator area
+                           .ignoresSafeArea(edges: .bottom)
             // Icons row — sits in the bar, center button overflows upward
             HStack(spacing: 0) {
                 ForEach(tabs, id: \.self) { tab in
@@ -159,7 +172,7 @@ private struct RegularTabButton: View {
     private var icon: String {
         switch tab {
         case .home:     return isSelected ? "house.fill"    : "house"
-        case .search:   return "magnifyingglass"
+        case .friends:  return isSelected ? "person.2.fill" : "person.2"
         case .messages: return isSelected ? "message.fill"  : "message"
         case .profile:  return isSelected ? "person.fill"   : "person"
         default:        return ""

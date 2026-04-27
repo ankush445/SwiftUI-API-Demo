@@ -38,7 +38,7 @@ struct PostCardView: View {
                         .foregroundStyle(.primaryText)
 
                     Text(timeAgo(post.createdAt))
-                        .font(.caption)
+                        .customFont(.regular, 13)
                         .foregroundStyle(.secondaryText)
                 }
                
@@ -103,19 +103,19 @@ struct PostCardView: View {
 
                   }
                 .buttonStyle(.plain)
-                Button(action: {}) {
-                      Image(systemName: "square.and.arrow.up.fill")
-                        .foregroundStyle(.textFieldIconBackground)
-
-                  }
-                .buttonStyle(.plain)
-                Spacer()
-                Button(action: {}) {
-                      Image(systemName: "bookmark.fill")
-                        .foregroundStyle(.textFieldIconBackground)
-
-                  }
-                .buttonStyle(.plain)
+//                Button(action: {}) {
+//                      Image(systemName: "square.and.arrow.up.fill")
+//                        .foregroundStyle(.textFieldIconBackground)
+//
+//                  }
+//                .buttonStyle(.plain)
+//                Spacer()
+//                Button(action: {}) {
+//                      Image(systemName: "bookmark.fill")
+//                        .foregroundStyle(.textFieldIconBackground)
+//
+//                  }
+//                .buttonStyle(.plain)
 
             }
             

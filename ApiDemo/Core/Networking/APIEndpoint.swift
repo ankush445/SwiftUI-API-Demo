@@ -9,7 +9,7 @@ public enum AppEnvironment {
     var baseURL: URL {
         switch self {
         case .local:
-            return URL(string: "http://192.168.1.148:3000/api")!
+            return URL(string: "http://192.168.1.16:3000/api")!
         case .staging:
             return URL(string: "https://jsonplaceholder.typicode.com")!
         case .production:
@@ -50,7 +50,14 @@ enum APIEndpoint: APIEndpointProtocol {
     case getRepliesComment(commentId: String, cursor: String?)
     case commentLike(commentId: String)
 
-
+    // Friends
+    case getSuggestUser(cursor: String?, limit: Int)
+    case sendFollowRequest(id: String)
+    case unfollow(id: String)
+    case cancelFollowRequest(id: String)
+    case getPendingRequests(cursor: String?, limit: Int)
+    case respondPendingRequest(id: String, action: String)
+    case searchUser(search: String?, cursor: String?, limit: Int)
 
 
     
@@ -69,10 +76,10 @@ enum APIEndpoint: APIEndpointProtocol {
             return "/users/signup"
         case .login:
             return "/users/login"
-        case .forgotPassword(let email):
+        case .forgotPassword:
             return "/users/forgot-password"
 
-        case .resetPassword( let token,let password):
+        case .resetPassword:
             return "/users/reset-password"
         case .delete:
             return "/users/delete"
@@ -99,20 +106,35 @@ enum APIEndpoint: APIEndpointProtocol {
             return "/comments/\(commentId)/replies"
         case .commentLike(let commentId):
             return "/comments/\(commentId)/like"
+           // Friends
             
-       
+        case .getSuggestUser:
+            return "/users/suggestions"
+        case .sendFollowRequest(let id):
+            return "/follow/\(id)"
+        case .unfollow(id: let id):
+            return "/follow/unfollow/\(id)"
+        case .cancelFollowRequest(id: let id):
+            return "/follow/cancel/\(id)"
+        case .getPendingRequests:
+            return "/follow/requests"
 
-
+        case .respondPendingRequest(let id, _):
+            return "/follow/respond/\(id)"
+        case .searchUser:
+            return "/users/search"
         }
     }
     
     var method: HTTPMethod {
         switch self {
-        case .getFeed,.getUserPosts,.getComment, .getRepliesComment, .checkUsername:
+        case .getFeed,.getUserPosts,.getComment, .getRepliesComment, .checkUsername, .getSuggestUser, .getPendingRequests, .searchUser:
             return .get
-        case .signUp ,.login,.getRefreshToken, .logout, .createPost,.postLike, .addComment, .addReply, .commentLike, .forgotPassword, .resetPassword:
+        case .signUp ,.login,.getRefreshToken, .logout, .createPost,.postLike, .addComment, .addReply, .commentLike, .forgotPassword, .resetPassword, .sendFollowRequest:
             return .post
-        case .delete:
+        case .respondPendingRequest:
+            return .put
+        case .delete, .unfollow, .cancelFollowRequest:
             return .delete
         }
     }
@@ -145,6 +167,10 @@ enum APIEndpoint: APIEndpointProtocol {
             return ["postId": postId,
                     "text": text,
                     "parentCommentId": parentId
+            ]
+            
+        case .respondPendingRequest(_, let action):
+            return ["action": action,
             ]
         default:
             return nil
@@ -192,6 +218,35 @@ enum APIEndpoint: APIEndpointProtocol {
             if let cursor = cursor {
                 items.append(URLQueryItem(name: "cursor", value: cursor))
             }
+            return items
+        case .getSuggestUser(let cursor,let limit):
+            var items: [URLQueryItem] = []
+            if let cursor = cursor {
+                items.append(URLQueryItem(name: "cursor", value: cursor))
+            }
+            items.append(URLQueryItem(name: "limit", value: "\(limit)"))
+            return items
+            
+            
+        case .getPendingRequests(let cursor, let limit):
+            var items: [URLQueryItem] = []
+            if let cursor = cursor {
+                items.append(URLQueryItem(name: "cursor", value: cursor))
+            }
+            items.append(URLQueryItem(name: "limit", value: "\(limit)"))
+            return items
+            
+        case .searchUser(let search, let cursor, let limit):
+            var items: [URLQueryItem] = []
+            if let cursor = cursor {
+                items.append(URLQueryItem(name: "cursor", value: cursor))
+            }
+            if let query = search, !query.isEmpty {
+                items.append(URLQueryItem(name: "search", value: search))
+            }
+            items.append(URLQueryItem(name: "limit", value: "\(limit)"))
+
+            
             return items
         default:
             return nil

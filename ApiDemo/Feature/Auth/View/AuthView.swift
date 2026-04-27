@@ -1,6 +1,4 @@
 import SwiftUI
-import FancyToastKit
-import SwiftUI_Loader
 
 struct AuthView: View {
     

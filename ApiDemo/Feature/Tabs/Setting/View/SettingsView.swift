@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import FancyToastKit
-import SwiftUI_Loader
 struct SettingsView: View {
     
     @Bindable var session: SessionManager

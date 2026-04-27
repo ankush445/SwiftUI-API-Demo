@@ -51,3 +51,5 @@ func makeCaption(username: String, content: String) -> AttributedString {
     
     return attributed
 }
+
+
