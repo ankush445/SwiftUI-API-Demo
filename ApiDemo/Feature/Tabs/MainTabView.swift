@@ -1,10 +1,12 @@
 import SwiftUI
+import UIKit
 
 // MARK: - MainTabView
 
 struct MainTabView: View {
     @Environment(SessionManager.self)    private var session
     @Environment(NavigationManager.self) private var nav
+    @State private var isKeyboardVisible = false
 
     var body: some View {
         @Bindable var nav = nav
@@ -129,13 +131,14 @@ struct MainTabView: View {
             .ignoresSafeArea(edges: .bottom)
 
             // ── Custom Tab Bar ────────────────────────────────
-            CustomTabBar(
-                selectedTab: Binding(
-                    get: { nav.selectedTab },
-                    set: { nav.switchTab(to: $0) }
+            if !isKeyboardVisible {
+                CustomTabBar(
+                    selectedTab: Binding(
+                        get: { nav.selectedTab },
+                        set: { nav.switchTab(to: $0) }
+                    )
                 )
-            )
-            .ignoresSafeArea(.keyboard, edges: .bottom)
+            }
         }
         .sheet(item: $nav.activeSheet) { sheet in
             switch sheet {
@@ -153,6 +156,21 @@ struct MainTabView: View {
                 nav.selectedTab = .home
                 nav.presentSheet(.createPost)
             }
+        }
+        .preferredColorScheme(nil)
+        .onAppear {
+            // Set status bar background color
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithTransparentBackground()
+            appearance.backgroundColor = UIColor(Color.appSecondaryBackground)
+            UINavigationBar.appearance().standardAppearance = appearance
+            UINavigationBar.appearance().scrollEdgeAppearance = appearance
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            isKeyboardVisible = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            isKeyboardVisible = false
         }
     }
 }

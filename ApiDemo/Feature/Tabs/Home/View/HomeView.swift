@@ -127,8 +127,19 @@ struct HomeView: View {
         }
         .loadingIndicator(isLoading: (vm.isLoading && vm.nextCursor == nil))
         .toastView(toast: $vm.toast)
+        .onAppear {
+            // Only load if posts are empty (first time)
+            if vm.posts.isEmpty && !vm.isInitialLoading {
+                Task {
+                    await vm.loadPosts()
+                }
+            }
+        }
         .task {
-            await vm.loadPosts()
+            // Only load on first appearance
+            if vm.posts.isEmpty {
+                await vm.loadPosts()
+            }
         }
         .sheet(item: $selectedPost) { post in
             CommentView(post: post, viewModel: CommentViewModel(repository: AppDI.shared.postRepository), session: session)

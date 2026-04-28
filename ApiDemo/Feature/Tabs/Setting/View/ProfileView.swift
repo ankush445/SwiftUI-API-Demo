@@ -119,9 +119,19 @@ struct ProfileView: View {
         }
         .loadingIndicator(isLoading: (vm.isLoading && vm.nextCursor == nil))
         .toastView(toast: $vm.toast)
-        
+        .onAppear {
+            // Only load if posts are empty (first time)
+            if vm.profile == nil && !vm.isInitialLoading {
+                Task {
+                    await vm.loadProfile()
+                }
+            }
+        }
         .task {
-            await vm.loadProfile()
+            // Only load on first appearance
+            if vm.profile == nil {
+                await vm.loadProfile()
+            }
         }
         .navigationBarBackButtonHidden()
         .sheet(item: $selectedPost) { post in

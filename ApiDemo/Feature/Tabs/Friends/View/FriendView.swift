@@ -100,8 +100,19 @@ struct FriendView: View {
         }
         .loadingIndicator(isLoading: (vm.isLoading && vm.suggestFriendNextCursor == nil))
         .toastView(toast: $vm.toast)
+        .onAppear {
+            // Only load if data is empty (first time)
+            if vm.suggestedFriends.isEmpty && vm.friendRequests.isEmpty && !vm.isInitialLoading {
+                Task {
+                    await vm.loadFriends()
+                }
+            }
+        }
         .task {
-            await vm.loadFriends()
+            // Only load on first appearance
+            if vm.suggestedFriends.isEmpty && vm.friendRequests.isEmpty {
+                await vm.loadFriends()
+            }
         }
     }
     
