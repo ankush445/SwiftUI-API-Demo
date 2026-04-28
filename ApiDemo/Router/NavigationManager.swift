@@ -15,40 +15,19 @@ enum AppTab: Int, CaseIterable {
     case createPost
     case messages
     case profile
-
-//    var title: String {
-//        switch self {
-//        case .home:       return AppStrings.home
-//        case .friends:     return AppStrings.friends
-//        case .createPost: return AppStrings.create
-//        case .messages:   return AppStrings.messages
-//        case .profile:    return AppStrings.profile
-//        }
-//    }
-//
-//    var icon: String {
-//        switch self {
-//        case .home:       return "house.fill"
-//        case .friends:     return "person.3"
-//        case .createPost: return "plus.app.fill"
-//        case .messages:   return "message.fill"
-//        case .profile:    return "person.crop.circle.fill"
-//        }
-//    }
 }
 
 // MARK: - Per-Tab Routes
 
 enum HomeRoute: Hashable {
-    case postDetail(postID: String)
     case userProfile(userID: String)
-    case comments(postID: String)
+    case followers(userId: String, username: String, selectedTab: Int)
 }
 
 enum FriendRoute: Hashable {
-    case FriendRequest
-//    case userProfile(userID: String)
-//    case postDetail(postID: String)
+    case friendRequest
+    case userProfile(userID: String)
+    case followers(userId: String, username: String, selectedTab: Int)
 }
 
 enum MessagesRoute: Hashable {
@@ -57,10 +36,7 @@ enum MessagesRoute: Hashable {
 }
 
 enum ProfileRoute: Hashable {
-    case editProfile
-    case settings
-    case followers
-    case following
+    case followers(userId: String, username: String, selectedTab: Int)
 }
 
 // MARK: - Sheet / Full Screen Cover
@@ -88,8 +64,6 @@ enum AppFullScreen: Identifiable {
 }
 
 // MARK: - NavigationManager
-// Mirrors your SessionManager pattern: @Observable singleton,
-// injected via .environment(nav) and read with @Environment(NavigationManager.self).
 
 @Observable
 final class NavigationManager {
@@ -97,7 +71,7 @@ final class NavigationManager {
     static let shared = NavigationManager()
     private init() {}
 
-    // MARK: Auth stack
+    // MARK: Auth
     var authPath: NavigationPath = NavigationPath()
 
     // MARK: Active tab
@@ -109,12 +83,12 @@ final class NavigationManager {
     var messagesPath: NavigationPath = NavigationPath()
     var profilePath:  NavigationPath = NavigationPath()
 
-    // MARK: Sheet / full screen
+    // MARK: Overlays
     var activeSheet:      AppSheet?      = nil
     var activeFullScreen: AppFullScreen? = nil
 
     // ─────────────────────────────────────────
-    // MARK: Auth Actions
+    // MARK: Auth
     // ─────────────────────────────────────────
 
     func showForgotPassword() {
@@ -124,21 +98,20 @@ final class NavigationManager {
     func showResetPassword() {
         authPath.append(AuthRoute.resetPassword)
     }
-    ///  Pop one screen
+
     func authPop() {
+        guard !authPath.isEmpty else { return }
         authPath.removeLast()
     }
-    /// Pops entire auth stack back to Login.
+
     func popToLogin() {
         authPath = NavigationPath()
     }
-    
 
     // ─────────────────────────────────────────
-    // MARK: Tab Actions
+    // MARK: Tab Switching
     // ─────────────────────────────────────────
 
-    /// Tapping the already-active tab pops it to root (Instagram / Twitter behaviour).
     func switchTab(to tab: AppTab) {
         if selectedTab == tab {
             popToRoot(for: tab)
@@ -150,7 +123,7 @@ final class NavigationManager {
     func popToRoot(for tab: AppTab) {
         switch tab {
         case .home:       homePath     = NavigationPath()
-        case .friends:     friendPath   = NavigationPath()
+        case .friends:    friendPath   = NavigationPath()
         case .messages:   messagesPath = NavigationPath()
         case .profile:    profilePath  = NavigationPath()
         case .createPost: break
@@ -166,90 +139,97 @@ final class NavigationManager {
     }
 
     // ─────────────────────────────────────────
-    // MARK: Home
+    // MARK: Safe Pop (fixes crash on empty path)
+    // ─────────────────────────────────────────
+
+    func pop() {
+        switch selectedTab {
+        case .home:
+            guard !homePath.isEmpty else { return }
+            homePath.removeLast()
+        case .friends:
+            guard !friendPath.isEmpty else { return }
+            friendPath.removeLast()
+        case .messages:
+            guard !messagesPath.isEmpty else { return }
+            messagesPath.removeLast()
+        case .profile:
+            guard !profilePath.isEmpty else { return }
+            profilePath.removeLast()
+        case .createPost:
+            break
+        }
+    }
+
+    // ─────────────────────────────────────────
+    // MARK: Push — NO forced tab switching
+    //
+    // ⚠️ Key fix: pushHome / pushFriend / pushProfile
+    // only mutate THEIR OWN path. They never touch
+    // selectedTab. This prevents ProfileView or
+    // FollowListView from hijacking the active tab
+    // when reused across multiple tabs.
     // ─────────────────────────────────────────
 
     func pushHome(_ route: HomeRoute) {
-        selectedTab = .home
         homePath.append(route)
     }
 
-    // ─────────────────────────────────────────
-    // MARK: Friends
-    // ─────────────────────────────────────────
-
     func pushFriend(_ route: FriendRoute) {
-        selectedTab = .friends
         friendPath.append(route)
     }
-    
-     
-    func popFriend() {
-        selectedTab = .friends
-        friendPath.removeLast()
-    }
-
-    // ─────────────────────────────────────────
-    // MARK: Messages
-    // ─────────────────────────────────────────
 
     func pushMessages(_ route: MessagesRoute) {
-        selectedTab = .messages
+        selectedTab = .messages   // messages are always a deliberate tab switch
         messagesPath.append(route)
     }
 
-    // ─────────────────────────────────────────
-    // MARK: Profile
-    // ─────────────────────────────────────────
-
     func pushProfile(_ route: ProfileRoute) {
-        selectedTab = .profile
+        // Only called from the Profile tab itself.
+        // Other tabs push ProfileView via their own route enums.
         profilePath.append(route)
     }
 
     // ─────────────────────────────────────────
-    // MARK: Sheet / Full Screen
+    // MARK: Cross-tab convenience
     // ─────────────────────────────────────────
 
-    func presentSheet(_ sheet: AppSheet) {
-        activeSheet = sheet
-    }
-
-    func dismissSheet() {
-        activeSheet = nil
-    }
-
-    func presentFullScreen(_ cover: AppFullScreen) {
-        activeFullScreen = cover
-    }
-
-    func dismissFullScreen() {
-        activeFullScreen = nil
-    }
-
-    // ─────────────────────────────────────────
-    // MARK: Deep Link
-    // ─────────────────────────────────────────
-
-    func handleDeepLink(_ url: URL) {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              let host = components.host else { return }
-
-        switch host {
-        case "post":
-            if let id = components.queryItems?.first(where: { $0.name == "id" })?.value {
-                pushHome(.postDetail(postID: id))
-            }
-        case "user":
-            if let id = components.queryItems?.first(where: { $0.name == "id" })?.value {
-                pushHome(.userProfile(userID: id))
-            }
-        case "messages":
-            if let id = components.queryItems?.first(where: { $0.name == "id" })?.value {
-                pushMessages(.conversation(userID: id))
-            }
+    /// Push followers/following from ProfileView without knowing which tab is active.
+    /// ProfileView calls this single method; the manager routes to the right stack.
+    func pushFollowers(userId: String, username: String, selectedTab: Int) {
+        switch self.selectedTab {
+        case .home:
+            homePath.append(HomeRoute.followers(userId: userId, username: username, selectedTab: selectedTab))
+        case .friends:
+            friendPath.append(FriendRoute.followers(userId: userId, username: username, selectedTab: selectedTab))
+        case .profile:
+            profilePath.append(ProfileRoute.followers(userId: userId, username: username, selectedTab: selectedTab))
         default:
             break
         }
     }
+
+    /// Push a user profile from any tab without knowing the current context.
+    func pushUserProfile(userID: String) {
+        switch self.selectedTab {
+        case .home:
+            homePath.append(HomeRoute.userProfile(userID: userID))
+        case .friends:
+            friendPath.append(FriendRoute.userProfile(userID: userID))
+        default:
+            break
+        }
+    }
+
+    // ─────────────────────────────────────────
+    // MARK: Overlays
+    // ─────────────────────────────────────────
+
+    func presentSheet(_ sheet: AppSheet) { activeSheet = sheet }
+    func dismissSheet()                  { activeSheet = nil   }
+
+    func presentFullScreen(_ cover: AppFullScreen) { activeFullScreen = cover }
+    func dismissFullScreen()                       { activeFullScreen = nil   }
+
+    func handleDeepLink(_ url: URL) { }
 }

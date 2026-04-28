@@ -7,99 +7,110 @@
 
 import SwiftUI
 struct SuggestedFriendRow: View {
-    @State private var isFollowing = false
-
+    
     let suggestUser: SuggestFriendModel
     let onAdd: () -> Void
+    let onTapProfile: () -> Void
     
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
+            
+            // 👤 Avatar
             Text(suggestUser.name.prefix(1))
-                .frame(width: 50, height: 50)
-                .background(Color.blue)
+                .customFont(.semiBold, 18)
+                .frame(width: 48, height: 48)
+                .background(dynamicColor(for: suggestUser.name))
                 .foregroundColor(.white)
                 .clipShape(Circle())
-            VStack(alignment: .leading){
+            
+            // 🧾 Info
+            VStack(alignment: .leading, spacing: 4) {
+                
                 Text(suggestUser.name)
-                    .customFont(.semiBold, 16)
+                    .customFont(.semiBold, 15)
                     .foregroundStyle(.primaryText)
-
+                    .lineLimit(1)
+                
                 Text(suggestUser.username)
                     .customFont(.regular, 13)
                     .foregroundStyle(.secondaryText)
+                    .lineLimit(1)
                 
+                // 👥 Mutual Friends
                 if suggestUser.mutualCount > 0 {
                     HStack(spacing: 6) {
                         
-                        // 👥 Overlapping avatars (max 3)
-                        ZStack {
-                            ForEach(Array(suggestUser.mutualUsers.enumerated()), id: \.offset) { index, user in
+                        ZStack(alignment: .leading) {
+                            ForEach(Array(suggestUser.mutualUsers.prefix(3).enumerated()), id: \.offset) { index, user in
                                 
                                 Text(user.name.prefix(1))
-                                    .customFont(.semiBold, 10)
-                                    .frame(width: 22, height: 22)
+                                    .customFont(.semiBold, 9)
+                                    .frame(width: 20, height: 20)
                                     .background(dynamicColor(for: user.name))
                                     .foregroundColor(.white)
                                     .clipShape(Circle())
-                                    .offset(x: CGFloat(index * 12))
+                                    .offset(x: CGFloat(index * 14))
                             }
                         }
-                        .frame(width: 40, alignment: .leading)
                         
-                        // 📝 Text
+                        
                         Text(mutualText)
-                            .customFont(.regular, 12)
+                            .customFont(.regular, 11)
                             .foregroundStyle(.secondaryText)
                     }
                 }
-                
             }
-          
-            Spacer()
+            .onTapGesture {
+                onTapProfile()
+            }
             
+            Spacer(minLength: 8)
+            
+            // 🎯 Follow Button
             Button(action: {
                 onAdd()
             }) {
                 if suggestUser.isLoading {
                     ProgressView()
-                        .frame(minWidth: 90)
+                        .frame(width: 80, height: 30)
                 } else {
                     Text(buttonTitle)
-                        .customFont(.semiBold, 14)
-                        .foregroundColor(suggestUser.followStatus == .none ? .white : .primaryText)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .frame(minWidth: 90)
-                        .background(
-                            suggestUser.followStatus == .none ? Color.buttonBackground : Color.gray.opacity(0.2)
-                        )
+                        .customFont(.semiBold, 13)
+                        .foregroundColor(buttonTextColor)
+                        .frame(width: 90, height: 32)
+                        .background(buttonBackground)
                         .clipShape(Capsule())
                 }
             }
             .disabled(suggestUser.isLoading)
-            .animation(.easeInOut, value: suggestUser.followStatus)
         }
+        .contentShape(Rectangle()) // 👈 full row tappable
     }
-    
+    private var buttonBackground: Color {
+        suggestUser.followStatus == .none
+        ? .buttonBackground
+        : Color.gray.opacity(0.15)
+    }
+    private var buttonTextColor: Color {
+        suggestUser.followStatus == .none
+        ? .white
+        : .primaryText
+    }
     private var buttonTitle: String {
         switch suggestUser.followStatus {
         case .none: return AppStrings.follow
         case .pending: return AppStrings.requested
-        case .following: return AppStrings.following
+        case .following: return AppStrings.unfollow
+        case .follower: return AppStrings.followBack
+        case .mutual: return AppStrings.message
         }
     }
     
     private var mutualText: String {
-        let names = suggestUser.mutualUsers.prefix(2).map { $0.name }
-        
-        if names.isEmpty {
-            return "\(suggestUser.mutualCount) mutual friends"
+        if suggestUser.mutualCount == 1 {
+            return AppStrings.oneMutualFriend
+        } else {
+            return "\(suggestUser.mutualCount)  \(AppStrings.oneMutualFriend)"
         }
-        
-        if names.count == 1 {
-            return "\(names[0]) + \(suggestUser.mutualCount - 1) mutual friends"
-        }
-        
-        return "\(names[0]), \(names[1]) + \(suggestUser.mutualCount - 2) mutual friends"
     }
 }

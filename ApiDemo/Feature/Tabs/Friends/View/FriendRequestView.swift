@@ -98,7 +98,7 @@ struct FriendRequestView: View {
                 
                 // 👈 Left (Back)
                 CustomBackButton(title: nil) {
-                    nav.popFriend()
+                    nav.pop()
                 }
                 .frame(width: 44, alignment: .leading) // fixed width
                 
@@ -131,6 +131,8 @@ struct FriendRequestView: View {
                     },
                     onReject: {
                         Task { await vm.rejectRequest(request) }
+                    }, onTapProfile: {
+                        nav.pushFriend(FriendRoute.userProfile(userID: request.requester.id))
                     }
                 )
                 .onAppear{

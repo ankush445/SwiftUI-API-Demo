@@ -58,6 +58,11 @@ enum APIEndpoint: APIEndpointProtocol {
     case getPendingRequests(cursor: String?, limit: Int)
     case respondPendingRequest(id: String, action: String)
     case searchUser(search: String?, cursor: String?, limit: Int)
+    case getUserProfile(id: String, cursor: String?, limit: Int)
+    case getFollowers(id: String, search: String?, cursor: String?, limit: Int)
+    case getFollowing(id: String, search: String?, cursor: String?, limit: Int)
+    case removeFollower(id: String)
+
 
 
     
@@ -123,18 +128,27 @@ enum APIEndpoint: APIEndpointProtocol {
             return "/follow/respond/\(id)"
         case .searchUser:
             return "/users/search"
+            
+        case.getUserProfile(let id,_, _):
+            return "/users/profile/\(id)"
+        case .getFollowers(let id, _, _, _):
+            return "/follow/followers/\(id)"
+        case .getFollowing(let id, _, _, _):
+            return "/follow/following/\(id)"
+        case .removeFollower(let id):
+            return "/follow/remove-follower/\(id)"
         }
     }
     
     var method: HTTPMethod {
         switch self {
-        case .getFeed,.getUserPosts,.getComment, .getRepliesComment, .checkUsername, .getSuggestUser, .getPendingRequests, .searchUser:
+        case .getFeed,.getUserPosts,.getComment, .getRepliesComment, .checkUsername, .getSuggestUser, .getPendingRequests, .searchUser, .getUserProfile, .getFollowers, .getFollowing:
             return .get
         case .signUp ,.login,.getRefreshToken, .logout, .createPost,.postLike, .addComment, .addReply, .commentLike, .forgotPassword, .resetPassword, .sendFollowRequest:
             return .post
         case .respondPendingRequest:
             return .put
-        case .delete, .unfollow, .cancelFollowRequest:
+        case .delete, .unfollow, .cancelFollowRequest, .removeFollower:
             return .delete
         }
     }
@@ -237,6 +251,40 @@ enum APIEndpoint: APIEndpointProtocol {
             return items
             
         case .searchUser(let search, let cursor, let limit):
+            var items: [URLQueryItem] = []
+            if let cursor = cursor {
+                items.append(URLQueryItem(name: "cursor", value: cursor))
+            }
+            if let query = search, !query.isEmpty {
+                items.append(URLQueryItem(name: "search", value: search))
+            }
+            items.append(URLQueryItem(name: "limit", value: "\(limit)"))
+
+            
+            return items
+            
+        case .getUserProfile(_, let cursor, let limit):
+            var items: [URLQueryItem] = []
+            if let cursor = cursor {
+                items.append(URLQueryItem(name: "cursor", value: cursor))
+            }
+            items.append(URLQueryItem(name: "limit", value: "\(limit)"))
+
+            
+            return items
+        case .getFollowers(_, let search, let cursor, let limit):
+            var items: [URLQueryItem] = []
+            if let cursor = cursor {
+                items.append(URLQueryItem(name: "cursor", value: cursor))
+            }
+            if let query = search, !query.isEmpty {
+                items.append(URLQueryItem(name: "search", value: search))
+            }
+            items.append(URLQueryItem(name: "limit", value: "\(limit)"))
+
+            
+            return items
+        case .getFollowing(_, let search, let cursor, let limit):
             var items: [URLQueryItem] = []
             if let cursor = cursor {
                 items.append(URLQueryItem(name: "cursor", value: cursor))

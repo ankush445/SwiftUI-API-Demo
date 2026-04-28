@@ -7,7 +7,8 @@
 
 import SwiftUI
 struct HomeView: View {
-    
+    @Environment(NavigationManager.self) private var nav
+
     @State private var vm: HomeViewModel
     
     @Bindable var session: SessionManager  // ✅ works perfectly with @Observable
@@ -57,6 +58,9 @@ struct HomeView: View {
                                 },
                                 onComment: {
                                     selectedPost = post
+                                },
+                                onTapProfile: {
+                                    nav.pushUserProfile(userID: post.user.id)
                                 }
                             )
                             .onAppear {
@@ -80,7 +84,7 @@ struct HomeView: View {
                                 .font(.largeTitle)
                                 .foregroundColor(.gray)
                             
-                            Text("No posts yet")
+                            Text(AppStrings.noPostYet)
                                 .foregroundColor(.gray)
                         }
                         .padding(.top, 100)

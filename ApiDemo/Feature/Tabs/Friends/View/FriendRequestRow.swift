@@ -11,6 +11,7 @@ struct FriendRequestRow: View {
     let request: FriendRequestModel
     let onAccept: () -> Void
     let onReject: () -> Void
+    let onTapProfile:() -> Void
     
     var body: some View {
         HStack(spacing: 12) {
@@ -39,6 +40,9 @@ struct FriendRequestRow: View {
                 Text(AppStrings.wantsToFollowYou)
                     .customFont(.regular, 12)
                     .foregroundStyle(.secondaryText)
+            }
+            .onTapGesture {
+                onTapProfile()
             }
             
             Spacer(minLength: 8)
@@ -74,6 +78,7 @@ struct FriendRequestRow: View {
                 }
             }
         }
+        .contentShape(Rectangle()) // 👈 full row tappable
     }
 }
 

@@ -61,13 +61,34 @@ enum AppStrings {
     static let seeAll = localized("seeAll")
     static let requested = localized("requested")
     static let follow = localized("follow")
+    static let followBack = localized("followBack")
+
+    static let followers = localized("followers")
     static let following = localized("following")
+    static let unfollow = localized("unfollow")
+
+    static let message = localized("message")
     static let wantsToFollowYou = localized("wantsToFollowYou")
     static let accept = localized("accept")
     static let delete = localized("delete")
-    static let results = NSLocalizedString("results", comment: "")
-    static let noUsersFound = NSLocalizedString("no_users_found", comment: "")
-    static let noFriendsYet = NSLocalizedString("no_friends_yet", comment: "")
+    static let results = localized("results")
+    static let noUsersFound = localized("no_users_found")
+    static let noFriendsYet = localized("no_friends_yet")
+    static let posts = localized("posts")
+    static let noPostYet = localized("noPostYet")
+    static let editProfile = localized("editProfile")
+
+    static let noFollowers = localized("no_followers")
+    static let noFollowing = localized("no_following")
+    static let noResults = localized("no_results")
+    static let tryDifferentKeyword = localized("try_different_keyword")
+    static let noFollowersSubtitle = localized("no_followers_subtitle")
+    static let noFollowingSubtitle = localized("no_following_subtitle")
+    static let oneMutualFriend = localized("one_mutual_friend")
+    static let mutualFriends = localized("mutual_friends")
+
+
+    
 
 }
 

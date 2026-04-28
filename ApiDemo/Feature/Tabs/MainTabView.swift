@@ -11,55 +11,85 @@ struct MainTabView: View {
 
         ZStack(alignment: .bottom) {
 
-            // ── Page Content ──────────────────────────────────
             TabView(selection: $nav.selectedTab) {
 
+                // ── Home ──────────────────────────────────────
+                // ProfileView and FollowListView are declared HERE
+                // inside the Home stack. They are NOT routed through
+                // ProfileRoute, so they never touch nav.profilePath.
                 NavigationStack(path: $nav.homePath) {
                     HomeView(
                         viewModel: HomeViewModel(repository: AppDI.shared.postRepository),
                         session: session
                     )
                     .navigationDestination(for: HomeRoute.self) { route in
-                        
-//                        switch route {
-//                        case .postDetail(let id):
-//                           Text("Post")
-//                        case .userProfile(let id):                           Text("Post")
-//
-//                        case .comments(let id):                               Text("Post")
-//
-//                        }
+                        switch route {
+                        case .userProfile(let userID):
+                            // ✅ Reuses ProfileView but stays on Home stack
+                            ProfileView(
+                                viewModel: ProfileViewModel(
+                                    repository: AppDI.shared.profileRepository,
+                                    userId: userID
+                                )
+                            )
+
+                        case .followers(let userId, let username, let tab):
+                            FollowListView(
+                                viewModel: FollowListViewModel(
+                                    repository: AppDI.shared.followersRepository,
+                                    userId: userId,
+                                    username: username,
+                                    selectedTab: tab == 0 ? .followers : .following
+                                )
+                            )
+                        }
                     }
                 }
                 .tag(AppTab.home)
-            
 
+                // ── Friends ───────────────────────────────────
                 NavigationStack(path: $nav.friendPath) {
                     FriendView(
-                        viewModel: FriendViewModel(repository: AppDI.shared.friendRepository)                    )
+                        viewModel: FriendViewModel(repository: AppDI.shared.friendRepository)
+                    )
                     .navigationDestination(for: FriendRoute.self) { route in
-                        switch route  {
-                        case .FriendRequest:
-                            FriendRequestView(viewModel: FriendViewModel(repository: AppDI.shared.friendRepository) )
-                       
+                        switch route {
+                        case .friendRequest:
+                            FriendRequestView(
+                                viewModel: FriendViewModel(repository: AppDI.shared.friendRepository)
+                            )
+
+                        case .userProfile(let userID):
+                            // ✅ Same ProfileView, but lives on the Friend stack
+                            ProfileView(
+                                viewModel: ProfileViewModel(
+                                    repository: AppDI.shared.profileRepository,
+                                    userId: userID
+                                )
+                            )
+
+                        case .followers(let userId, let username, let tab):
+                            FollowListView(
+                                viewModel: FollowListViewModel(
+                                    repository: AppDI.shared.followersRepository,
+                                    userId: userId,
+                                    username: username,
+                                    selectedTab: tab == 0 ? .followers : .following
+                                )
+                            )
                         }
-//                        switch route {
-//                        case .postDetail(let id):
-//                           Text("Post")
-//                        case .userProfile(let id):                           Text("Post")
-//
-//                        case .comments(let id):                               Text("Post")
-//
-//                        }
                     }
                 }
                 .tag(AppTab.friends)
 
-                // Placeholder — intercepted by onChange below
-                Color.clear.tag(AppTab.createPost)
+                // ── Create Post (sheet) ───────────────────────
+                Color.clear
+                    .tag(AppTab.createPost)
 
+                // ── Messages ──────────────────────────────────
                 NavigationStack(path: $nav.messagesPath) {
-//                    MessagesView()
+                    // Add MessagesView here when ready
+//                    EmptyView()
 //                        .navigationDestination(for: MessagesRoute.self) { route in
 //                            switch route {
 //                            case .conversation(let id): ConversationView(userID: id)
@@ -69,21 +99,33 @@ struct MainTabView: View {
                 }
                 .tag(AppTab.messages)
 
+                // ── Profile (own tab) ─────────────────────────
+                // This is the ONLY place that uses nav.profilePath.
+                // Pushes from Home/Friends never reach this stack.
                 NavigationStack(path: $nav.profilePath) {
-                    SettingsView(viewModel: SettingViewModel(repository: AppDI.shared.settingRepository, session: session), session: session)
-//                        .navigationDestination(for: ProfileRoute.self) { route in
-//                            switch route {
-//                            case .editProfile: EditProfileView()
-//                            case .settings:    SettingsView()
-//                            case .followers:   FollowersView()
-//                            case .following:   FollowingView()
-//                            }
-//                        }
-
+                    ProfileView(
+                        viewModel: ProfileViewModel(
+                            repository: AppDI.shared.profileRepository,
+                            userId: session.user?.id ?? ""
+                        )
+                    )
+                    .navigationDestination(for: ProfileRoute.self) { route in
+                        switch route {
+                        case .followers(let userId, let username, let tab):
+                            FollowListView(
+                                viewModel: FollowListViewModel(
+                                    repository: AppDI.shared.followersRepository,
+                                    userId: userId,
+                                    username: username,
+                                    selectedTab: tab == 0 ? .followers : .following
+                                )
+                            )
+                        }
+                    }
                 }
                 .tag(AppTab.profile)
             }
-            .tabViewStyle(.page(indexDisplayMode: .never)) // hides default system tab bar
+            .tabViewStyle(.page(indexDisplayMode: .never))
             .ignoresSafeArea(edges: .bottom)
 
             // ── Custom Tab Bar ────────────────────────────────
@@ -94,19 +136,17 @@ struct MainTabView: View {
                 )
             )
             .ignoresSafeArea(.keyboard, edges: .bottom)
-
         }
         .sheet(item: $nav.activeSheet) { sheet in
-//            switch sheet {
-//            case .createPost:
-//                CreatePostSheet()
-//            case .imagePicker: ImagePickerSheet()
-//            }
+            switch sheet {
+            case .createPost:  EmptyView() // replace with CreatePostView()
+            case .imagePicker: EmptyView() // replace with ImagePickerView()
+            }
         }
         .fullScreenCover(item: $nav.activeFullScreen) { cover in
-//            switch cover {
-//            case .camera: CameraView()
-//            }
+            switch cover {
+            case .camera: EmptyView() // replace with CameraView()
+            }
         }
         .onChange(of: nav.selectedTab) { _, newTab in
             if newTab == .createPost {
@@ -126,11 +166,9 @@ struct CustomTabBar: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            // Bar background
             Color.appSecondaryBackground
-                           // ✅ Extend background into home indicator area
-                           .ignoresSafeArea(edges: .bottom)
-            // Icons row — sits in the bar, center button overflows upward
+                .ignoresSafeArea(edges: .bottom)
+
             HStack(spacing: 0) {
                 ForEach(tabs, id: \.self) { tab in
                     if tab == .createPost {
@@ -141,7 +179,6 @@ struct CustomTabBar: View {
                 }
             }
             .padding(.top, 10)
-            .padding(.bottom, 0)
         }
         .frame(height: 49)
     }
@@ -190,36 +227,26 @@ private struct CreateTabButton: View {
             selectedTab = .createPost
         } label: {
             ZStack {
-                // Faint outer ring
                 Circle()
                     .strokeBorder(Color.white.opacity(0.12), lineWidth: 1.5)
                     .frame(width: 54, height: 54)
 
-                // Indigo filled circle
                 Circle()
-                    .fill(
-                        Color.buttonBackground
-                    )
+                    .fill(Color.buttonBackground)
                     .frame(width: 50, height: 50)
 
-                // Plus icon
                 Image(systemName: "plus")
                     .font(.system(size: 20, weight: .bold))
                     .foregroundStyle(.white)
             }
-            // Raise above the bar
             .offset(y: -15)
             .frame(maxWidth: .infinity, minHeight: 30)
             .contentShape(
                 Circle()
                     .size(width: 54, height: 54)
-                    .offset(x: 0, y: -15)  // match hit area to visual position
+                    .offset(x: 0, y: -15)
             )
         }
         .buttonStyle(.plain)
     }
-}
-
-#Preview {
-    MainTabView()
 }

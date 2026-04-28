@@ -44,7 +44,13 @@
 "suggested" = "Suggested";
 "requested" = "Requested";
 "follow" = "Follow";
+"followBack" = "Follow back";
+
 "following" = "Following";
+"unfollow" = "Unfollow";
+
+"followers" = "Followers";
+"message" =   "message";
 "friendRequests" = "Friend Requests";
 "seeAll" = "See All";
 "wantsToFollowYou" = "Wants to follow you";
@@ -53,3 +59,17 @@
 "results" = "Results";
 "no_users_found" = "No users found";
 "no_friends_yet" = "No friends yet";
+"posts" = "Posts";
+"noPostYet" = "No Posts Yet";
+"editProfile" = "Edit Profile";
+
+"no_followers" = "No followers yet";
+"no_following" = "Not following anyone";
+
+"no_results" = "No results found";
+"try_different_keyword" = "Try a different keyword";
+
+"no_followers_subtitle" = "When people follow this account, they will appear here.";
+"no_following_subtitle" = "Accounts followed will appear here.";
+"one_mutual_friend" = "1 mutual friend";
+"mutual_friends" = " mutual friends";

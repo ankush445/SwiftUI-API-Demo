@@ -20,13 +20,6 @@ protocol FriendRepositoryProtocol{
 
 final class FriendRepository: FriendRepositoryProtocol {
    
-    
-
-    
-
-   
-    
-    
     private let networkService: NetworkServiceProtocol
 
     init(networkService: NetworkServiceProtocol) {

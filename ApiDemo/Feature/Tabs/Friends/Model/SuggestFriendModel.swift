@@ -20,6 +20,8 @@ enum FollowStatus: String {
     case none
     case pending
     case following
+    case follower
+    case mutual
 }
 
 struct SuggestFriendModel: Codable, Identifiable {

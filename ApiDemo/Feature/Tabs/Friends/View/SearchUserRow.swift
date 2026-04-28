@@ -10,6 +10,7 @@ struct SearchUserRow: View {
     
     let user: SearchUserModel
     let onTap: () -> Void
+    let onTapProfile:()-> Void
     
     var body: some View {
         HStack(spacing: 12) {
@@ -28,6 +29,9 @@ struct SearchUserRow: View {
                 Text(user.username)
                     .customFont(.regular, 13)
                     .foregroundStyle(.secondaryText)
+            }
+            .onTapGesture {
+                onTapProfile()
             }
             
             Spacer()
@@ -49,13 +53,16 @@ struct SearchUserRow: View {
                 }
             }
         }
+        .contentShape(Rectangle()) // 👈 full row tappable
     }
     
     private var buttonTitle: String {
         switch user.followStatus {
         case .none: return AppStrings.follow
         case .pending: return AppStrings.requested
-        case .following: return AppStrings.following
+        case .following: return AppStrings.unfollow
+        case .follower: return AppStrings.followBack
+        case .mutual: return AppStrings.message
         }
     }
 }

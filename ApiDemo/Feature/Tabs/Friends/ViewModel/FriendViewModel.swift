@@ -8,7 +8,7 @@
 import SwiftUI
 import Observation
 @Observable
-final class FriendViewModel {
+final class FriendViewModel: ToastPresentable {
     
     private let repository: FriendRepositoryProtocol
     var searchText: String = ""
@@ -61,6 +61,7 @@ final class FriendViewModel {
     }
     
     // MARK: - Pagination
+    @MainActor
     func fetchSuggestFriends() async {
         guard !isLoading, suggestFriendHasMore else { return }
         
@@ -110,15 +111,29 @@ final class FriendViewModel {
     }
     
     private func reset() {
-        // suggested
+        
+        // ❌ Cancel any running search task
+        searchTask?.cancel()
+        searchTask = nil
+        
+        // 🔍 Search
+        searchText = ""
+        searchResults = []
+        searchNextCursor = nil
+        searchHasMore = true
+        
+        // 👥 Suggested
         suggestedFriends = []
         suggestFriendNextCursor = nil
         suggestFriendHasMore = true
         
-        // requests
+        // 📩 Requests
         friendRequests = []
         requestNextCursor = nil
         requestHasMore = true
+        
+        // ⚡ States
+        isLoading = false
     }
     
     @MainActor
@@ -182,6 +197,11 @@ final class FriendViewModel {
             case .following:
                 let _ = try await repository.unfollow(id: user.id)
                 suggestedFriends[index].followStatus = .none
+            case .follower:
+                let _ = try await repository.sendFollowRequest(id: user.id)
+                suggestedFriends[index].followStatus = .pending
+            case .mutual:
+                print("message functionality implement here")
             }
             
         } catch {
@@ -254,6 +274,11 @@ final class FriendViewModel {
             case .following:
                _ = try await repository.unfollow(id: user.id)
                 searchResults[index].followStatus = .none
+            case .follower:
+                _ = try await repository.sendFollowRequest(id: user.id)
+                searchResults[index].followStatus = .pending
+            case .mutual:
+                print("message comming soon")
             }
         } catch {
             print(error)

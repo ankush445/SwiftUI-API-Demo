@@ -31,4 +31,10 @@ final class AppDI {
     lazy var friendRepository: FriendRepositoryProtocol = FriendRepository(
         networkService: networkService
     )
+    lazy var profileRepository: ProfileRepositaryProtocol = ProfileRepositary(
+        networkService: networkService
+    )
+    lazy var followersRepository: FollowersRepositoryProtocol = FollowersRepository(
+        networkService: networkService
+    )
 }

@@ -11,6 +11,8 @@ struct PostCardView: View {
     let post: Post
     let onLike: () -> Void
     let onComment: () -> Void
+    let onTapProfile: () -> Void
+
     var randomImageUrl: String? {
         // Random images (you can replace with API later)
         let images = [
@@ -60,6 +62,9 @@ struct PostCardView: View {
                         .foregroundStyle(.secondaryText)
                 }
                
+            }
+            .onTapGesture {
+                onTapProfile()
             }
             
             // 📝 Content

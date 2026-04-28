@@ -138,7 +138,7 @@ struct FriendView: View {
                 
                 Spacer()
                 Button{
-                    nav.pushFriend(FriendRoute.FriendRequest)
+                    nav.pushFriend(FriendRoute.friendRequest)
                 } label: {
                     Text(AppStrings.seeAll)
                         .customFont(.medium, 14)
@@ -156,6 +156,8 @@ struct FriendView: View {
                     },
                     onReject: {
                         Task { await vm.rejectRequest(request) }
+                    }, onTapProfile: {
+                        nav.pushUserProfile(userID: request.id)
                     }
                 )
             }
@@ -173,6 +175,8 @@ struct FriendView: View {
                     Task{
                         await vm.toggleFollow(user: suggestUser)
                     }
+                } onTapProfile:{
+                    nav.pushUserProfile(userID: suggestUser.id)
                 }
                 .onAppear {
                     if suggestUser.id == vm.suggestedFriends.last?.id {
@@ -207,10 +211,13 @@ struct FriendView: View {
             }
             
             ForEach(vm.searchResults) { user in
+                
                 SearchUserRow(user: user) {
                     Task {
                         await vm.toggleSearchFollow(user: user)
                     }
+                } onTapProfile: {
+                    nav.pushUserProfile(userID: user.id)
                 }
                 .onAppear {
                     if user.id == vm.searchResults.last?.id {
