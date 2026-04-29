@@ -223,4 +223,8 @@ final class FollowListViewModel {
             following[index].isLoading = false
         }
     }
+    
+    func refresh() async {
+        await loadInitial()
+    }
 }

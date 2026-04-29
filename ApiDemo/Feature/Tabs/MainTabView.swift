@@ -12,6 +12,7 @@ struct MainTabView: View {
         @Bindable var nav = nav
 
         ZStack(alignment: .bottom) {
+            Color.appSecondaryBackground.ignoresSafeArea(edges: .top) // Fills the status bar area
 
             TabView(selection: $nav.selectedTab) {
 
@@ -31,6 +32,7 @@ struct MainTabView: View {
                             ProfileView(
                                 viewModel: ProfileViewModel(
                                     repository: AppDI.shared.profileRepository,
+                                    followRepositary: AppDI.shared.followersRepository,
                                     userId: userID
                                 )
                             )
@@ -65,8 +67,11 @@ struct MainTabView: View {
                             // ✅ Same ProfileView, but lives on the Friend stack
                             ProfileView(
                                 viewModel: ProfileViewModel(
-                                    repository: AppDI.shared.profileRepository,
-                                    userId: userID
+                                    viewModel: ProfileViewModel(
+                                        repository: AppDI.shared.profileRepository,
+                                        followRepositary: AppDI.shared.followersRepository,
+                                        userId: userID
+                                    )
                                 )
                             )
 
@@ -108,6 +113,7 @@ struct MainTabView: View {
                     ProfileView(
                         viewModel: ProfileViewModel(
                             repository: AppDI.shared.profileRepository,
+                            followRepositary:  AppDI.shared.followersRepository,
                             userId: session.user?.id ?? ""
                         )
                     )
@@ -157,15 +163,7 @@ struct MainTabView: View {
                 nav.presentSheet(.createPost)
             }
         }
-        .preferredColorScheme(nil)
-        .onAppear {
-            // Set status bar background color
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithTransparentBackground()
-            appearance.backgroundColor = UIColor(Color.appSecondaryBackground)
-            UINavigationBar.appearance().standardAppearance = appearance
-            UINavigationBar.appearance().scrollEdgeAppearance = appearance
-        }
+        .preferredColorScheme(.dark)
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
             isKeyboardVisible = true
         }
@@ -212,6 +210,7 @@ private struct RegularTabButton: View {
 
     var body: some View {
         Button {
+            HapticManager.trigger(.light)
             selectedTab = tab
         } label: {
             Image(systemName: icon)
@@ -242,6 +241,7 @@ private struct CreateTabButton: View {
 
     var body: some View {
         Button {
+            HapticManager.trigger(.light)
             selectedTab = .createPost
         } label: {
             ZStack {

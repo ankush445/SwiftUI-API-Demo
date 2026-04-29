@@ -21,16 +21,16 @@ struct FollowListView: View {
           
             
             ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: 12) {
-                    CustomSearchBar(text: $vm.searchText, placeholder: AppStrings.search)
-                        .padding(.horizontal)
-                        .onChange(of: vm.searchText) { _, newValue in
-                            if newValue.isEmpty {
-                                Task { await vm.switchTab(vm.selectedTab) } // reload normal data
-                            } else {
-                                vm.scheduleSearch()
-                            }
+                CustomSearchBar(text: $vm.searchText, placeholder: AppStrings.search)
+                    .padding(.horizontal)
+                    .onChange(of: vm.searchText) { _, newValue in
+                        if newValue.isEmpty {
+                            Task { await vm.switchTab(vm.selectedTab) } // reload normal data
+                        } else {
+                            vm.scheduleSearch()
                         }
+                    }
+                LazyVStack(spacing: 12) {
                     if vm.selectedTab == .followers {
                         listView(users: vm.followers, loadMore: vm.fetchFollowers)
                     } else {
@@ -41,6 +41,11 @@ struct FollowListView: View {
             }
             .scrollContentBackground(.hidden)
             .background(Color.appBackground)
+            .refreshable {
+                await Task.detached {
+                    await vm.refresh()
+                }.value
+            }
         }
         .background(Color.appBackground)
         .navigationBarBackButtonHidden()

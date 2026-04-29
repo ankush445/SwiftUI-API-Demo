@@ -9,7 +9,7 @@ public enum AppEnvironment {
     var baseURL: URL {
         switch self {
         case .local:
-            return URL(string: "http://192.168.1.16:3000/api")!
+            return URL(string: "http://192.168.1.17:3000/api")!
         case .staging:
             return URL(string: "https://jsonplaceholder.typicode.com")!
         case .production:

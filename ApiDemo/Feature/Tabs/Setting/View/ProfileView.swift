@@ -313,5 +313,5 @@ struct ProfileView: View {
 }
 
 #Preview {
-    ProfileView(viewModel: ProfileViewModel(repository: AppDI.shared.profileRepository, userId: ""))
+    ProfileView(viewModel: ProfileViewModel(repository: AppDI.shared.profileRepository,followRepositary: AppDI.shared.followersRepository ,userId: ""))
 }

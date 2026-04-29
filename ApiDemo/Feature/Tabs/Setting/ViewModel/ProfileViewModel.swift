@@ -13,6 +13,9 @@ final class ProfileViewModel: ToastPresentable {
     var toast: FancyToast?
     
     private let repository: ProfileRepositaryProtocol
+    
+    private let followRepositary: FollowersRepositoryProtocol
+
     let userId: String
     
     var profile: ProfileModel?
@@ -25,8 +28,9 @@ final class ProfileViewModel: ToastPresentable {
     private var hasMore = true
     private var likingIds: Set<String> = []
 
-    init(repository: ProfileRepositaryProtocol, userId: String) {
+    init(repository: ProfileRepositaryProtocol, followRepositary: FollowersRepositoryProtocol, userId: String) {
         self.repository = repository
+        self.followRepositary = followRepositary
         self.userId = userId
     }
     
