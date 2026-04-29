@@ -1,5 +1,4 @@
 import Foundation
-import FancyToastKit
 import Observation
 @Observable
 final class AuthViewModel:ToastPresentable {

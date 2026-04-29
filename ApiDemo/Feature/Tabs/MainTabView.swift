@@ -65,15 +65,8 @@ struct MainTabView: View {
 
                         case .userProfile(let userID):
                             // ✅ Same ProfileView, but lives on the Friend stack
-                            ProfileView(
-                                viewModel: ProfileViewModel(
-                                    viewModel: ProfileViewModel(
-                                        repository: AppDI.shared.profileRepository,
-                                        followRepositary: AppDI.shared.followersRepository,
-                                        userId: userID
-                                    )
-                                )
-                            )
+                            
+                            ProfileView(viewModel: ProfileViewModel(repository: AppDI.shared.profileRepository, followRepositary: AppDI.shared.followersRepository, userId: userID))
 
                         case .followers(let userId, let username, let tab):
                             FollowListView(

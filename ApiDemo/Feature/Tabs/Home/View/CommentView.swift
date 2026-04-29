@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftUI_Loader
 
 struct CommentView: View {
     

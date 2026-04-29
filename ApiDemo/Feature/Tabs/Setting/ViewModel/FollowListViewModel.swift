@@ -195,7 +195,7 @@ final class FollowListViewModel {
         
         do {
             _ = try await repository.removeFollower(id: user.id)
-            
+            followers[index].isLoading = false
            _ = withAnimation {
                 followers.remove(at: index)
             }
@@ -214,7 +214,7 @@ final class FollowListViewModel {
         
         do {
             _ = try await repository.unfollow(id: user.id)
-            
+            following[index].isLoading = false
             _ = withAnimation {
                 following.remove(at: index)
             }

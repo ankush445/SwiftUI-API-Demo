@@ -19,6 +19,7 @@ final class ProfileViewModel: ToastPresentable {
     let userId: String
     
     var profile: ProfileModel?
+   
     var posts: [Post] = []
     
     var isLoading = false
@@ -27,6 +28,8 @@ final class ProfileViewModel: ToastPresentable {
     var nextCursor: String?
     private var hasMore = true
     private var likingIds: Set<String> = []
+    var isFollowLoading = false
+    private var previousStatus: FollowStatus?
 
     init(repository: ProfileRepositaryProtocol, followRepositary: FollowersRepositoryProtocol, userId: String) {
         self.repository = repository
@@ -136,4 +139,66 @@ final class ProfileViewModel: ToastPresentable {
         }
     }
     
+    
+    @MainActor
+    func performAction() async {
+        
+        guard let userId = profile?.id,
+              let currentStatus = profile?.followStatus,
+              !isFollowLoading else { return }
+        
+        isFollowLoading = true
+        
+        // 🔥 store previous ONLY when going to pending
+        if currentStatus == .none || currentStatus == .follower {
+            previousStatus = currentStatus
+        }
+        
+        // 🔥 Optimistic UI
+        profile?.followStatus = nextState(from: currentStatus)
+        
+        do {
+            switch currentStatus {
+                
+            case .none, .follower:
+                _ = try await followRepositary.sendFollowRequest(id: userId)
+                
+            case .pending:
+                _ = try await followRepositary.cancelRequest(id: userId)
+                
+            case .following, .mutual:
+                _ = try await followRepositary.unfollow(id: userId)
+            }
+            
+            isFollowLoading = false
+            
+        } catch {
+            // rollback
+            profile?.followStatus = currentStatus
+            isFollowLoading = false
+            showError(error)
+        }
+    }
+    
+    private func nextState(from status: FollowStatus) -> FollowStatus {
+        
+        switch status {
+            
+        case .none:
+            return .pending
+            
+        case .follower:
+            return .pending   // follow back request
+            
+        case .pending:
+            // 🔥 THIS IS YOUR MAIN REQUIREMENT
+            return previousStatus == .follower ? .follower : .none
+            
+        case .following:
+            return .none
+            
+        case .mutual:
+            return .following
+        }
+    }
 }

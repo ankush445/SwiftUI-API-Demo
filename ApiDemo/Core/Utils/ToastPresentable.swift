@@ -9,7 +9,6 @@
 // ToastPresentable.swift
 
 import Foundation
-import FancyToastKit
 protocol ToastPresentable: AnyObject {
     var toast: FancyToast? { get set }
 }

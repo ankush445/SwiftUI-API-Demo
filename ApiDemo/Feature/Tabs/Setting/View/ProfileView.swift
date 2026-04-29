@@ -277,8 +277,17 @@ struct ProfileView: View {
                 
             } else {
                 
-                Button(buttonTitle) {
+                Button {
+                    Task { await vm.performAction() }
+                } label: {
                     
+                    if vm.isFollowLoading {
+                        ProgressView()
+                            .frame(height: 20)
+                    } else {
+                        Text(buttonTitle)
+                            .customFont(.semiBold, 14)
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
@@ -293,6 +302,8 @@ struct ProfileView: View {
                     : .primaryText
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 10))
+                .disabled(vm.isFollowLoading)
+                .animation(.easeInOut, value: vm.profile?.followStatus)
             }
         }
     }
