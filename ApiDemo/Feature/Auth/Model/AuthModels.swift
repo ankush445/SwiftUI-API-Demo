@@ -41,6 +41,8 @@ struct User: Codable, Identifiable {
     let postCount: Int?
     let followStatus: String?
     let bio: String?
+    let website: String?
+    let profileImage: String?
     let createdAt: String?
     let updatedAt: String?
 
@@ -54,6 +56,8 @@ struct User: Codable, Identifiable {
         case postCount
         case followStatus
         case bio
+        case website
+        case profileImage
         case createdAt
         case updatedAt
     }
@@ -83,4 +87,22 @@ struct ProfileModel {
     let following: Int
     let postCount: Int
     var followStatus: FollowStatus
+    
+    func toDomainUser() -> User {
+        return User(
+            id: id,
+            name: name,
+            username: username,
+            email: email,
+            followers: followers,
+            following: following,
+            postCount: postCount,
+            followStatus: followStatus.rawValue,
+            bio: nil,
+            website: nil,
+            profileImage: nil,
+            createdAt: nil,
+            updatedAt: nil
+        )
+    }
 }

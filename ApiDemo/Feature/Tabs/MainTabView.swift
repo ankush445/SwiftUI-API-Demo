@@ -121,6 +121,20 @@ struct MainTabView: View {
                                     selectedTab: tab == 0 ? .followers : .following
                                 )
                             )
+                        case .editProfile:
+                            EditProfileView(
+                                viewModel: EditProfileViewModel(repository: AppDI.shared.editProfileRepository, session: session))
+                            
+//                        case .myPosts(let userId):
+//                            UserPostView(
+//                                viewModel: UserPostViewModel(repository: AppDI.shared.postRepository, userId: userId),
+//                                session: session
+//                            )
+                        case .settings:
+                            SettingsView(
+                                viewModel: SettingViewModel(repository: AppDI.shared.settingRepository, session: session),
+                                session: session
+                            )
                         }
                     }
                 }

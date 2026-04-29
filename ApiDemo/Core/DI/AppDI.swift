@@ -37,4 +37,7 @@ final class AppDI {
     lazy var followersRepository: FollowersRepositoryProtocol = FollowersRepository(
         networkService: networkService
     )
+    lazy var editProfileRepository: EditProfileRepositoryProtocol = EditProfileRepository(
+        networkService: networkService
+    )
 }

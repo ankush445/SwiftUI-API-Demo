@@ -62,6 +62,10 @@ enum APIEndpoint: APIEndpointProtocol {
     case getFollowers(id: String, search: String?, cursor: String?, limit: Int)
     case getFollowing(id: String, search: String?, cursor: String?, limit: Int)
     case removeFollower(id: String)
+    
+    // Settings & Profile
+    case updateProfile(request: EditProfileRequest)
+    case changePassword(oldPassword: String, newPassword: String)
 
 
 
@@ -137,6 +141,10 @@ enum APIEndpoint: APIEndpointProtocol {
             return "/follow/following/\(id)"
         case .removeFollower(let id):
             return "/follow/remove-follower/\(id)"
+        case .updateProfile:
+            return "/users/update-profile"
+        case .changePassword:
+            return "/users/change-password"
         }
     }
     
@@ -150,6 +158,8 @@ enum APIEndpoint: APIEndpointProtocol {
             return .put
         case .delete, .unfollow, .cancelFollowRequest, .removeFollower:
             return .delete
+        case .updateProfile, .changePassword:
+            return .put
         }
     }
     
@@ -185,6 +195,19 @@ enum APIEndpoint: APIEndpointProtocol {
             
         case .respondPendingRequest(_, let action):
             return ["action": action,
+            ]
+        case .updateProfile(let request):
+            return [
+                "name": request.name,
+                "username": request.username,
+                "bio": request.bio,
+                "website": request.website ?? "",
+                "profileImage": request.profileImage ?? ""
+            ]
+        case .changePassword(let oldPassword, let newPassword):
+            return [
+                "oldPassword": oldPassword,
+                "newPassword": newPassword
             ]
         default:
             return nil

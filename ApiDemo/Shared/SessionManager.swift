@@ -36,6 +36,10 @@ final class SessionManager {
         self.isLoggedIn = true
     }
     
+    func getUser()-> User?{
+        return userManager.getUser()
+    }
+    
     func logout() {
         tokenStorage.clearTokens()
         userManager.clear() // also sets loggedIn = false

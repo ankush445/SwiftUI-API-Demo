@@ -86,6 +86,61 @@ enum AppStrings {
     static let noFollowingSubtitle = localized("no_following_subtitle")
     static let oneMutualFriend = localized("one_mutual_friend")
     static let mutualFriends = localized("mutual_friends")
+    static let tapToChangeProfile = localized("tapToChangeProfile")
+    static let bio = localized("bio")
+    static let website = localized("website")
+    
+    
+    static let changePassword = localized("changePassword")
+    static let currentPassword = localized("currentPassword")
+    static let enterCurrentPassword = localized("enterCurrentPassword")
+    static let enterNewPassword = localized("enterNewPassword")
+    static let confirmNewPassword = localized("confirmNewPassword")
+    static let saveChanges = localized("saveChanges")
+    
+    static let settings = localized("settings")
+    static let account = localized("account")
+    static let myPosts = localized("myPosts")
+    static let viewYourPosts = localized("viewYourPosts")
+    static let updateYourInfo = localized("updateYourInfo")
+    static let savedPosts = localized("savedPosts")
+    static let bookmarkedPosts = localized("bookmarkedPosts")
+
+    static let preferences = localized("preferences")
+    static let notifications = localized("notifications")
+    static let manageNotifications = localized("manageNotifications")
+    static let privacySecurity = localized("privacySecurity")
+    static let controlProfileVisibility = localized("controlProfileVisibility")
+    static let blockedUsers = localized("blockedUsers")
+    static let manageBlockedAccounts = localized("manageBlockedAccounts")
+
+    static let support = localized("support")
+    static let helpCenter = localized("helpCenter")
+    static let getHelpSupport = localized("getHelpSupport")
+    static let termsConditions = localized("termsConditions")
+    static let readTerms = localized("readTerms")
+    static let privacyPolicy = localized("privacyPolicy")
+    static let readPrivacyPolicy = localized("readPrivacyPolicy")
+    static let aboutApp = localized("aboutApp")
+    static let appVersion = localized("appVersion")
+
+    static let dangerZone = localized("dangerZone")
+    static let deleteAccount = localized("deleteAccount")
+    static let deleteAccountDesc = localized("deleteAccountDesc")
+    static let logout = localized("logout")
+    static let logoutDesc = localized("logoutDesc")
+
+    static let logoutTitle = localized("logoutTitle")
+    static let logoutMessage = localized("logoutMessage")
+    static let deleteTitle = localized("deleteTitle")
+    static let deleteMessage = localized("deleteMessage")
+    static let cancel = localized("cancel")
+
+
+
+
+    
+    
 
 
     

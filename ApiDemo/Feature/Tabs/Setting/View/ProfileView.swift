@@ -258,15 +258,22 @@ struct ProfileView: View {
             if vm.profile?.id == session.user?.id {
                 
                 HStack(spacing: 10) {
-                    Button(AppStrings.editProfile) { }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(Color.buttonBackground)
-                        .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    Button {
+                        if let userId = vm.profile?.id {
+                            nav.pushProfile(ProfileRoute.editProfile)
+                        }
+                    } label: {
+                        Text(AppStrings.editProfile)
+                            .customFont(.semiBold, 14)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(Color.buttonBackground)
+                    .foregroundColor(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                     
                     Button {
-                        
+                        nav.pushProfile(ProfileRoute.settings)
                     } label: {
                         Image(systemName: "gearshape")
                             .frame(width: 42, height: 42)
@@ -292,12 +299,12 @@ struct ProfileView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
                 .background(
-                    vm.profile?.followStatus == FollowStatus.none
+                    (vm.profile?.followStatus == FollowStatus.none || vm.profile?.followStatus == FollowStatus.follower)
                     ? Color.buttonBackground
                     : Color.gray.opacity(0.15)
                 )
                 .foregroundColor(
-                    vm.profile?.followStatus == FollowStatus.none
+                    (vm.profile?.followStatus == FollowStatus.none || vm.profile?.followStatus == FollowStatus.follower)
                     ? .white
                     : .primaryText
                 )

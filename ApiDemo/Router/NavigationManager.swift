@@ -37,8 +37,9 @@ enum MessagesRoute: Hashable {
 
 enum ProfileRoute: Hashable {
     case followers(userId: String, username: String, selectedTab: Int)
-//    case editProfile
-//    case setting
+    case editProfile
+//    case myPosts(userId: String)
+    case settings
 }
 
 // MARK: - Sheet / Full Screen Cover

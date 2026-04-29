@@ -45,6 +45,8 @@ final class FollowListViewModel {
     // MARK: Load Initial
     @MainActor
     func loadInitial() async {
+        resetAll()
+        searchText = ""  
         await self.selectedTab == .followers ? fetchFollowers() : fetchFollowing()
     }
     
@@ -226,5 +228,22 @@ final class FollowListViewModel {
     
     func refresh() async {
         await loadInitial()
+    }
+    @MainActor
+    private func resetAll() {
+        
+        searchTask?.cancel()
+        
+        // Followers
+        followers = []
+        followerCursor = nil
+        followerHasMore = true
+        
+        // Following
+        following = []
+        followingCursor = nil
+        followingHasMore = true
+        
+        isLoading = false
     }
 }

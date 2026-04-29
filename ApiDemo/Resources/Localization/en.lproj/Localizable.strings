@@ -73,3 +73,49 @@
 "no_following_subtitle" = "Accounts followed will appear here.";
 "one_mutual_friend" = "1 mutual friend";
 "mutual_friends" = " mutual friends";
+"tapToChangeProfile" = "Tap to change profile picture";
+"bio" = "Bio";
+"website" = "Website (Optional)";
+"changePassword" = "Change Password";
+"currentPassword" = "Current Password";
+"enterCurrentPassword" = "Enter current password";
+"enterNewPassword" = "Enter new password";
+"confirmNewPassword" = "Confirm new password";
+"saveChanges" = "Save Changes";
+"settings" = "Settings";
+"account" = "Account";
+"myPosts" = "My Posts";
+"viewYourPosts" = "View all your posts";
+"updateYourInfo" = "Update your information";
+"savedPosts" = "Saved Posts";
+"bookmarkedPosts" = "Your bookmarked posts";
+
+"preferences" = "Preferences";
+"notifications" = "Notifications";
+"manageNotifications" = "Manage notification settings";
+"privacySecurity" = "Privacy & Security";
+"controlProfileVisibility" = "Control who can see your profile";
+"blockedUsers" = "Blocked Users";
+"manageBlockedAccounts" = "Manage blocked accounts";
+
+"support" = "Support";
+"helpCenter" = "Help Center";
+"getHelpSupport" = "Get help and support";
+"termsConditions" = "Terms & Conditions";
+"readTerms" = "Read our terms";
+"privacyPolicy" = "Privacy Policy";
+"readPrivacyPolicy" = "Read our privacy policy";
+"aboutApp" = "About App";
+"appVersion" = "Version %@";
+
+"dangerZone" = "Danger Zone";
+"deleteAccount" = "Delete Account";
+"deleteAccountDesc" = "Permanently delete your account";
+"logout" = "Logout";
+"logoutDesc" = "Sign out from your account";
+
+"logoutTitle" = "Logout?";
+"logoutMessage" = "Are you sure you want to logout?";
+"deleteTitle" = "Delete Account?";
+"deleteMessage" = "This action cannot be undone. All your data will be permanently deleted.";
+"cancel" = "Cancel";
